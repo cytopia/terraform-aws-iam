@@ -1,0 +1,28 @@
+---
+
+###
+### Travis settings
+###
+sudo: required
+services:
+  - docker
+
+
+###
+### Installation
+###
+before_install: true
+install: true
+
+###
+### Linting
+###
+before_script:
+  - make lint
+
+
+###
+### Testing
+###
+script:
+  - make test ARGS="-var assumer_account_role_name=test -var assumer_account_id=1234567890"
