@@ -104,11 +104,6 @@ output "imperative_policy_attachment_ids" {
   value       = ["${aws_iam_role_policy_attachment.imperative_policy_attachment.*.id}"]
 }
 
-output "imperative_policy_attachment_names" {
-  description = "A list of names of shared policy attachments."
-  value       = ["${aws_iam_role_policy_attachment.imperative_policy_attachment.*.name}"]
-}
-
 output "imperative_policy_attachment_policy_arns" {
   description = "A list of ARNs of shared policy attachments."
   value       = ["${aws_iam_role_policy_attachment.imperative_policy_attachment.*.policy_arn}"]
