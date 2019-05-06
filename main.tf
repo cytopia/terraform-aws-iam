@@ -17,9 +17,9 @@ resource "aws_iam_role" "roles" {
   force_detach_policies = "${var.force_detach_policies}"
 
   tags = "${merge(
-		map("Name", lookup(var.roles[count.index], "name")),
-		var.tags
-	)}"
+    map("Name", lookup(var.roles[count.index], "name")),
+    var.tags
+  )}"
 }
 
 # ------------------------------------------------------------------------------------------------
