@@ -17,9 +17,9 @@ resource "aws_iam_role" "roles" {
   force_detach_policies = "${var.force_detach_policies}"
 
   tags = "${merge(
-		map("Name", lookup(var.roles[count.index], "name")),
-		var.tags
-	)}"
+    map("Name", lookup(var.roles[count.index], "name")),
+    var.tags
+  )}"
 }
 
 # ------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ resource "aws_iam_policy_attachment" "exclusive_policy_attachment" {
 
   name       = "${lookup(var.roles[count.index], "policy_name")}"
   roles      = ["${element(aws_iam_role.roles.*.name, count.index)}"]
-  policy_arn = "${element(aws_iam_policy.policies.*.arn, count.index)}"
+  policy_arn = "${aws_iam_policy.policies.*.arn[count.index]}"
 }
 
 # Additive adding of roles
@@ -56,5 +56,5 @@ resource "aws_iam_role_policy_attachment" "imperative_policy_attachment" {
   count = "${var.exclusive_policy_attachment ? 0 : length(var.roles)}"
 
   role       = "${element(aws_iam_role.roles.*.name, count.index)}"
-  policy_arn = "${element(aws_iam_policy.policies.*.arn, count.index)}"
+  policy_arn = "${aws_iam_policy.policies.*.arn[count.index]}"
 }
