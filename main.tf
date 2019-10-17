@@ -6,8 +6,8 @@ resource "aws_iam_role" "roles" {
   count = "${length(var.roles)}"
 
   name        = "${lookup(var.roles[count.index], "name")}"
-  path        = "${lookup(var.roles[count.index], "path", var.role_path)}"
-  description = "${lookup(var.roles[count.index], "desc", var.role_desc)}"
+  path        = "${lookup(var.roles[count.index], "path", "") == "" ? var.role_path : lookup(var.roles[count.index], "path")}"
+  description = "${lookup(var.roles[count.index], "desc", "") == "" ? var.role_desc : lookup(var.roles[count.index], "desc")}"
 
   # This policy defines who/what is allowed to use the current role
   assume_role_policy = "${file(lookup(var.roles[count.index], "trust_policy_file"))}"
@@ -30,8 +30,8 @@ resource "aws_iam_policy" "policies" {
   count = "${length(var.roles)}"
 
   name        = "${lookup(var.roles[count.index], "policy_name")}"
-  path        = "${lookup(var.roles[count.index], "policy_path", var.policy_path)}"
-  description = "${lookup(var.roles[count.index], "policy_desc", var.policy_desc)}"
+  path        = "${lookup(var.roles[count.index], "policy_path", "") == "" ? var.policy_path : lookup(var.roles[count.index], "policy_path")}"
+  description = "${lookup(var.roles[count.index], "policy_desc", "") == "" ? var.policy_desc : lookup(var.roles[count.index], "policy_desc")}"
 
   # This defines what permissions our role will be given
   policy = "${file(lookup(var.roles[count.index], "policy_file"))}"
