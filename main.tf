@@ -12,6 +12,10 @@ resource "aws_iam_role" "roles" {
   # This policy defines who/what is allowed to use the current role
   assume_role_policy = "${file(lookup(var.roles[count.index], "trust_policy_file"))}"
 
+  # The boundary defines the maximum allowed permissions which cannot exceed.
+  # Even if the policy has higher permission, the boundary sets the final limit
+  permissions_boundary = "${lookup(var.roles[count.index], "permissions_boundary", "")}"
+
   # Allow session for X seconds
   max_session_duration  = "${var.max_session_duration}"
   force_detach_policies = "${var.force_detach_policies}"
