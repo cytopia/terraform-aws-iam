@@ -14,6 +14,7 @@
 #		policy_path = "/"                  # defaults to 'policy_path' if not set
 #		policy_desc = "description"        # defaults to 'policy_desc' if not set
 #		policy_file = "policy.json"        # required: defines the policy
+#		permissions_boundary = "arn:..."   # optional: ARN of policy to set as permission boundary
 #	}
 #]
 
