@@ -2,8 +2,16 @@
 # Create Roles
 # ------------------------------------------------------------------------------------------------
 
+# Lazy evaluation of count to overcome:
+# module.aws_iam_permissions.aws_iam_role.roles: aws_iam_role.roles: value of 'count' cannot be computed
+resource "null_resource" "count" {
+  triggers {
+    count = "${length(var.roles)}"
+  }
+}
+
 resource "aws_iam_role" "roles" {
-  count = "${length(var.roles)}"
+  count = "${null_resource.count.triggers.count}"
 
   name        = "${lookup(var.roles[count.index], "name")}"
   path        = "${lookup(var.roles[count.index], "path", "") == "" ? var.role_path : lookup(var.roles[count.index], "path")}"
@@ -24,6 +32,8 @@ resource "aws_iam_role" "roles" {
     map("Name", lookup(var.roles[count.index], "name")),
     var.tags
   )}"
+
+  depends_on = ["null_resource.count"]
 }
 
 # ------------------------------------------------------------------------------------------------
@@ -31,7 +41,7 @@ resource "aws_iam_role" "roles" {
 # ------------------------------------------------------------------------------------------------
 
 resource "aws_iam_policy" "policies" {
-  count = "${length(var.roles)}"
+  count = "${null_resource.count.triggers.count}"
 
   name        = "${lookup(var.roles[count.index], "policy_name")}"
   path        = "${lookup(var.roles[count.index], "policy_path", "") == "" ? var.policy_path : lookup(var.roles[count.index], "policy_path")}"
@@ -48,7 +58,7 @@ resource "aws_iam_policy" "policies" {
 
 # Exclusive attachment of roles
 resource "aws_iam_policy_attachment" "exclusive_policy_attachment" {
-  count = "${var.exclusive_policy_attachment ? length(var.roles) : 0}"
+  count = "${var.exclusive_policy_attachment ? null_resource.count.triggers.count : 0}"
 
   name       = "${lookup(var.roles[count.index], "policy_name")}"
   roles      = ["${element(aws_iam_role.roles.*.name, count.index)}"]
@@ -57,7 +67,7 @@ resource "aws_iam_policy_attachment" "exclusive_policy_attachment" {
 
 # Additive adding of roles
 resource "aws_iam_role_policy_attachment" "imperative_policy_attachment" {
-  count = "${var.exclusive_policy_attachment ? 0 : length(var.roles)}"
+  count = "${var.exclusive_policy_attachment ? 0 : null_resource.count.triggers.count}"
 
   role       = "${element(aws_iam_role.roles.*.name, count.index)}"
   policy_arn = "${aws_iam_policy.policies.*.arn[count.index]}"
