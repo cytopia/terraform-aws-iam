@@ -23,6 +23,10 @@ variable "roles" {
   type        = "list"
 }
 
+variable "role_count" {
+  description = "An integer that specifies the number of items in 'roles' to overcome limitations of Terraform 0.11.x."
+}
+
 # -------------------------------------------------------------------------------------------------
 # Default Role settings
 # -------------------------------------------------------------------------------------------------
