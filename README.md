@@ -29,6 +29,8 @@ module "iam_roles" {
       policy_file = "logins/admin-policy.json"
     }
   ]
+  # Required to overcome some limitations of Terraform 0.11.x
+  role_count = 1
 ```
 
 **`logins/admin-assume.json`**
