@@ -6,113 +6,166 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 This Terraform module can create an arbitrary number of IAM roles with policies and trusted
-entities defined as JSON files.
-
-**Note:** Policy attachments can be done decleratively (exclusive) or imperatively (shared).
+entities defined as JSON or templatable json files files.
 
 
 ## Usage
 
-### Login roles via SAML
+### Assumeable roles
 
 ```hcl
 module "iam_roles" {
-  source = "github.com/cytopia/terraform-aws-iam-roles?ref=v0.1.0"
+  source = "github.com/cytopia/terraform-aws-iam-roles?ref=v2.0.0"
+
+  # List of policies to create
+  policies = [
+    {
+      name = "ro-billing"
+      path = "/assume/human/"
+      desc = "Provides read-only access to billing"
+      file = "policies/ro-billing.json"
+      vars = {}
+    },
+  ]
+
+  # Map of permissions boundaries to attach to specific roles
+  permissions_boundaries = {
+    "ROLE-DEV" = "arn:aws:iam::*:policy/perm-boundaries/default"
+  }
 
   # List of roles to manage
   roles = [
     {
-      name = "LOGIN-ADMIN"
-      trust_policy_file = "logins/admin-assume.json"
-      policy_name = "login-admin"
-      policy_path = "/federation/"
-      policy_file = "logins/admin-policy.json"
-    }
+      name              = "ROLE-ADMIN"
+      path              = ""
+      desc              = ""
+      trust_policy_file = "trust-policies/admin.json"
+      policies          = []
+      inline_policies   = []
+      policy_arns = [
+        "arn:aws:iam::aws:policy/AdministratorAccess",
+      ]
+    },
+    {
+      name              = "ROLE-DEV"
+      path              = ""
+      desc              = ""
+      trust_policy_file = "trust-policies/dev.json"
+      policies = [
+        "ro-billing",
+      ]
+      inline_policies = []
+      policy_arns = [
+        "arn:aws:iam::aws:policy/PowerUserAccess",
+      ]
+    },
   ]
-  # Required to overcome some limitations of Terraform 0.11.x
-  role_count = 1
+
+}
 ```
 
-**`logins/admin-assume.json`**
+**`trust-policies/admin.json`**
 
-Defines the trusted entity (Authentication)
+Defines the permissions (Authorization)
 ```json
 {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "",
       "Effect": "Allow",
+      "Action": "sts:AssumeRole",
       "Principal": {
-        "Federated": "arn:aws:iam::123456789:saml-provider/MyADFS"
+        "AWS": [
+          "arn:aws:iam::1234567:role/federation/LOGIN-ADMIN"
+        ]
       },
-      "Action": "sts:AssumeRoleWithSAML",
-      "Condition": {
-        "StringEquals": {
-          "SAML:aud": "https://signin.aws.amazon.com/saml"
-        }
-      }
+      "Condition": {}
+    }
+  ]
+}
+```
+**`trust-policies/dev.json`**
+
+Defines the permissions (Authorization)
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "AWS": [
+          "arn:aws:iam::1234567:role/federation/LOGIN-DEV",
+          "arn:aws:iam::1234567:role/federation/LOGIN-ADMIN"
+        ]
+      },
+      "Condition": {}
     }
   ]
 }
 ```
 
-**`logins/admin-policy.json`**
 
-Defines the permissions (Authorization)
+**`policies/ro-billing.json`**
 ```json
 {
-   "Version": "2012-10-17",
-   "Statement": [{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "BillingReadOnly",
       "Effect": "Allow",
-      "Action": "sts:AssumeRole",
+      "Action": [
+        "account:ListRegions",
+        "aws-portal:View*",
+        "awsbillingconsole:View*",
+        "budgets:View*",
+        "ce:Get*",
+        "cur:Describe*",
+        "pricing:Describe*",
+        "pricing:Get*"
+      ],
       "Resource": "*"
-   }]
+    }
+  ]
 }
 ```
 
 
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
-| roles | A list of dictionaries defining all roles. | list | n/a | yes |
-| role\_path | The path under which to create the role. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure. | string | `"/"` | no |
-| role\_desc | The description of the role. | string | `"Managed by Terraform"` | no |
-| max\_session\_duration | The maximum session duration (in seconds) that you want to set for the specified role. This setting can have a value from 1 hour to 12 hours. | string | `"3600"` | no |
+| roles | A list of dictionaries defining all roles. | object | n/a | yes |
 | force\_detach\_policies | Specifies to force detaching any policies the role has before destroying it. | string | `"true"` | no |
-| tags | Key-value mapping of tags for the IAM role. | map | `<map>` | no |
-| policy\_path | The default path under which to create the policy if not specified in the policies list. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure. | string | `"/"` | no |
+| max\_session\_duration | The maximum session duration (in seconds) that you want to set for the specified role. This setting can have a value from 1 hour to 12 hours specified in seconds. | string | `"3600"` | no |
+| permissions\_boundaries | A map of strings containing ARN's of policies to attach as permissions boundaries to roles. | map(string) | `{}` | no |
+| policies | A list of dictionaries defining all roles. | object | `[]` | no |
 | policy\_desc | The default description of the policy. | string | `"Managed by Terraform"` | no |
-| exclusive\_policy\_attachment | If true, the aws_iam_policy_attachment resource creates exclusive attachments of IAM policies. Across the entire AWS account, all of the users/roles/groups to which a single policy is attached must be declared by a single aws_iam_policy_attachment resource. This means that even any users/roles/groups that have the attached policy via any other mechanism (including other Terraform resources) will have that attached policy revoked by this resource. | string | `"true"` | no |
-
+| policy\_path | The default path under which to create the policy if not specified in the policies list. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure. | string | `"/"` | no |
+| role\_desc | The description of the role. | string | `"Managed by Terraform"` | no |
+| role\_path | The path under which to create the role. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure. | string | `"/"` | no |
+| tags | Key-value mapping of tags for the IAM role. | map | `{}` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| roles | The defined roles list |
-| role\_ids | The stable and unique string identifying the role. |
-| role\_arns | The Amazon Resource Name (ARN) specifying the role. |
-| role\_names | The name of the role. |
-| role\_paths | The path to the role. |
-| role\_session\_durations | The maximum session duration (in seconds) that you want to set for the specified role. This setting can have a value from 1 hour to 12 hours. |
-| role\_force\_detach\_policies | Specifies to force detaching any policies the role has before destroying it. |
-| role\_policies | A list of the policy definitions. |
-| role\_assume\_policies | A list of the policy definitions. |
-| policy\_arns | A list of ARN assigned by AWS to the policies. |
-| policy\_ids | A list of unique IDs of the policies. |
-| policy\_names | A list of names of the policies. |
-| policy\_paths | A list of paths of the policies. |
-| exclusive\_policy\_attachment\_ids | A list of unique IDs of exclusive policy attachments. |
-| exclusive\_policy\_attachment\_names | A list of names of exclusive policy attachments. |
-| exclusive\_policy\_attachment\_policy\_arns | A list of ARNs of exclusive policy attachments. |
-| exclusive\_policy\_attachment\_role\_names | A list of role names of exclusive policy attachments. |
-| imperative\_policy\_attachment\_ids | A list of unique IDs of shared policy attachments. |
-| imperative\_policy\_attachment\_names | A list of names of shared policy attachments. |
-| imperative\_policy\_attachment\_policy\_arns | A list of ARNs of shared policy attachments. |
-| imperative\_policy\_attachment\_role\_names | A list of role names of shared policy attachments. |
+| created\_inline\_policy\_attachments | Attached inline IAM policies |
+| created\_policies | Created customer managed IAM policies |
+| created\_policy\_arn\_attachments | Attached IAM policy arns |
+| created\_policy\_attachments | Attached customer managed IAM policies |
+| created\_roles | Created IAM roles |
+| local\_inline\_policies | The transformed inline policy map |
+| local\_policies | The transformed policy map |
+| local\_policy\_arns | The transformed policy arns map |
+| local\_role\_policies | The transformed role policy map |
+| var\_permissions\_boundaries | The defined roles list |
+| var\_policies | The transformed policy map |
+| var\_roles | The defined roles list |
 
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 ## Authors
 

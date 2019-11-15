@@ -1,31 +1,119 @@
 # -------------------------------------------------------------------------------------------------
+# Policy definition
+# -------------------------------------------------------------------------------------------------
+
+# Example policy definition:
+#
+# policies = [
+#   {
+#     name = "default-permission-boundary"
+#     path = "/boundaries/human/"
+#     desc = "Provides default permission boundary for assume roles"
+#     file = "boundaries/default.json.tmpl"
+#     vars = {
+#       currencryDescripe = "*",
+#     }
+#   },
+#   {
+#     name = "assume-human-ro-billing"
+#     path = "/assume/human/"
+#     desc = "Provides read-only access to billing"
+#     file = "policies/human/ro-billing.json"
+#     vars = {}
+#   },
+# ]
+
+variable "policies" {
+  description = "A list of dictionaries defining all roles."
+  type = list(object({
+    name = string      # Name of the policy
+    path = string      # Defaults to 'var.policy_path' variable if empty
+    desc = string      # Defaults to 'var.policy_desc' variable if empty
+    file = string      # Path to json or json.tmpl file of policy
+    vars = map(string) # Policy template variables {key: val, ...}
+  }))
+  default = []
+}
+
+
+# -------------------------------------------------------------------------------------------------
 # Role definition
 # -------------------------------------------------------------------------------------------------
 
 # Example role definition:
 #
-#roles = [
-#	{
-#		name = "FLA-ENG-DEV"               # required: name of the role
-#		path = "/"                         # defaults to 'path' variable if not set
-#		desc = "TERRAFORM MANAGED"         # defaults to 'description' variable if not set
-#		trust_policy_file = "trust.json"   # required: defines trust/assume policy
-#		policy_name = "play-sts-eng-dev"   # required
-#		policy_path = "/"                  # defaults to 'policy_path' if not set
-#		policy_desc = "description"        # defaults to 'policy_desc' if not set
-#		policy_file = "policy.json"        # required: defines the policy
-#		permissions_boundary = "arn:..."   # optional: ARN of policy to set as permission boundary
-#	}
-#]
+# roles = [
+#   {
+#     name              = "ASSUME-ADMIN"
+#     path              = ""
+#     desc              = ""
+#     trust_policy_file = "trust-policies/eng-ops.json"
+#     policies          = []
+#     inline_policies   = []
+#     policy_arns = [
+#       "arn:aws:iam::aws:policy/AdministratorAccess",
+#     ]
+#   },
+#   {
+#     name              = "ASSUME-DEV"
+#     path              = ""
+#     desc              = ""
+#     trust_policy_file = "trust-policies/eng-dev.json"
+#     policies = [
+#       "assume-human-ro-billing",
+#     ]
+#     inline_policies = []
+#     policy_arns = [
+#       "arn:aws:iam::aws:policy/PowerUserAccess",
+#     ]
+#   },
+# ]
 
 variable "roles" {
   description = "A list of dictionaries defining all roles."
-  type        = "list"
+  type = list(object({
+    name              = string       # Name of the role
+    path              = string       # Defaults to 'var.role_path' variable if empty
+    desc              = string       # Defaults to 'var.role_desc' variable if empty
+    trust_policy_file = string       # Path to file of trust/assume policy
+    policies          = list(string) # List of names of policies (must be defined in var.policies)
+    inline_policies = list(object({
+      name = string      # Name of the inline policy
+      file = string      # Path to json or json.tmpl file of policy
+      vars = map(string) # Policy template variables {key = val, ...}
+    }))
+    policy_arns = list(string) # List of existing policy ARN's
+  }))
 }
 
-variable "role_count" {
-  description = "An integer that specifies the number of items in 'roles' to overcome limitations of Terraform 0.11.x."
+
+# Example permissions_boundaries definition:
+#
+# permissions_boundaries = {
+#   <role-name> = "arn:aws:iam::1234567890:policy/test-perm-boundaries/test-default"
+# }
+
+variable "permissions_boundaries" {
+  description = "A map of strings containing ARN's of policies to attach as permissions boundaries to roles."
+  type        = map(string)
+  default     = {}
 }
+
+
+# -------------------------------------------------------------------------------------------------
+# Default Policy settings
+# -------------------------------------------------------------------------------------------------
+
+variable "policy_path" {
+  description = "The default path under which to create the policy if not specified in the policies list. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure."
+  default     = "/"
+}
+
+variable "policy_desc" {
+  description = "The default description of the policy."
+  default     = "Managed by Terraform"
+}
+
 
 # -------------------------------------------------------------------------------------------------
 # Default Role settings
@@ -42,7 +130,7 @@ variable "role_desc" {
 }
 
 variable "max_session_duration" {
-  description = "The maximum session duration (in seconds) that you want to set for the specified role. This setting can have a value from 1 hour to 12 hours."
+  description = "The maximum session duration (in seconds) that you want to set for the specified role. This setting can have a value from 1 hour to 12 hours specified in seconds."
   default     = "3600"
 }
 
@@ -53,25 +141,6 @@ variable "force_detach_policies" {
 
 variable "tags" {
   description = "Key-value mapping of tags for the IAM role."
-  type        = "map"
+  type        = map
   default     = {}
-}
-
-# -------------------------------------------------------------------------------------------------
-# Default Policy settings
-# -------------------------------------------------------------------------------------------------
-
-variable "policy_path" {
-  description = "The default path under which to create the policy if not specified in the policies list. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure."
-  default     = "/"
-}
-
-variable "policy_desc" {
-  description = "The default description of the policy."
-  default     = "Managed by Terraform"
-}
-
-variable "exclusive_policy_attachment" {
-  description = "If true, the aws_iam_policy_attachment resource creates exclusive attachments of IAM policies. Across the entire AWS account, all of the users/roles/groups to which a single policy is attached must be declared by a single aws_iam_policy_attachment resource. This means that even any users/roles/groups that have the attached policy via any other mechanism (including other Terraform resources) will have that attached policy revoked by this resource."
-  default     = true
 }
