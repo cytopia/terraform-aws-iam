@@ -7,16 +7,22 @@ locals {
   #
   # policies = [
   #   {
-  #     name = ""
-  #     path = ""
-  #     desc = ""
-  #     file = ""
+  #     name = "<policy-name>"
+  #     path = "<policy-path>"
+  #     desc = "<policy-desc>"
+  #     file = "<policy-file>"
+  #     vars = {
+  #       key = "val",
+  #     }
   #   },
   #   {
-  #     name = ""
-  #     path = ""
-  #     desc = ""
-  #     file = ""
+  #     name = "<policy-name>"
+  #     path = "<policy-path>"
+  #     desc = "<policy-desc>"
+  #     file = "<policy-file>"
+  #     vars = {
+  #       key = "val",
+  #     }
   #   },
   # }
   #
@@ -24,16 +30,22 @@ locals {
   #
   # policies = {
   #   "<policy-name>" = {
-  #     name = ""
-  #     path = ""
-  #     desc = ""
-  #     file = ""
+  #     name = "<policy-name>"
+  #     path = "<policy-path>"
+  #     desc = "<policy-desc>"
+  #     file = "<policy-file>"
+  #     vars = {
+  #       key = "val",
+  #     }
   #   }
   #   "<policy-name>" = {
-  #     name = ""
-  #     path = ""
-  #     desc = ""
-  #     file = ""
+  #     name = "<policy-name>"
+  #     path = "<policy-path>"
+  #     desc = "<policy-desc>"
+  #     file = "<policy-file>"
+  #     vars = {
+  #       key = "val",
+  #     }
   #   }
   # }
   policies = { for i, v in var.policies : var.policies[i]["name"] => v }
@@ -51,11 +63,13 @@ locals {
   # role_policies = [
   #   {
   #     "<role-name>:<policy-name>" = {
-  #       "name" = "<policy-name>"
-  #       "path" = "<policy-path>"
-  #       "desc" = "<policy-desc>"
-  #       "file" = "<policy-file>"
-  #       "vars" = {key = val}
+  #       name = "<policy-name>"
+  #       path = "<policy-path>"
+  #       desc = "<policy-desc>"
+  #       file = "<policy-file>"
+  #       vars = {
+  #         key = "val",
+  #       }
   #     }
   #   },
   # ]
@@ -84,16 +98,20 @@ locals {
   # inline_policies = [
   #   {
   #     "<role-name>:<policy-name>" = {
-  #       "name" = ""
-  #       "file" = ""
-  #       "vars" = {key = val}
+  #       name = "<policy-name>"
+  #       file = "<policy-file>"
+  #       vars = {
+  #         key = "val",
+  #       }
   #     }
   #   },
   #   {
   #     "<role-name>:<policy-name>" = {
-  #       "name" = ""
-  #       "file" = ""
-  #       "vars" = ""
+  #       name = "<policy-name>"
+  #       file = "<policy-file>"
+  #       vars = {
+  #         key = "val",
+  #       }
   #     }
   #   },
   # ]
@@ -121,10 +139,10 @@ locals {
   #
   # policy_arns = [
   #   {
-  #     "<role-name>:<policy-arn>" = "<policy-arn">
+  #     "<role-name>:<policy-arn>" = "<policy-arn>"
   #   },
   #   {
-  #     "<role-name>:<policy-arn>" = "<policy-arn">
+  #     "<role-name>:<policy-arn>" = "<policy-arn>"
   #   },
   # ]
   pa = flatten([
