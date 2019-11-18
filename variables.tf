@@ -27,8 +27,8 @@ variable "policies" {
   description = "A list of dictionaries defining all roles."
   type = list(object({
     name = string      # Name of the policy
-    path = string      # Defaults to 'var.policy_path' variable if empty
-    desc = string      # Defaults to 'var.policy_desc' variable if empty
+    path = string      # Defaults to 'var.policy_path' variable is set to null
+    desc = string      # Defaults to 'var.policy_desc' variable is set to null
     file = string      # Path to json or json.tmpl file of policy
     vars = map(string) # Policy template variables {key: val, ...}
   }))
@@ -73,8 +73,8 @@ variable "roles" {
   description = "A list of dictionaries defining all roles."
   type = list(object({
     name              = string       # Name of the role
-    path              = string       # Defaults to 'var.role_path' variable if empty
-    desc              = string       # Defaults to 'var.role_desc' variable if empty
+    path              = string       # Defaults to 'var.role_path' variable is set to null
+    desc              = string       # Defaults to 'var.role_desc' variable is set to null
     trust_policy_file = string       # Path to file of trust/assume policy
     policies          = list(string) # List of names of policies (must be defined in var.policies)
     inline_policies = list(object({

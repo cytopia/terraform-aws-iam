@@ -17,8 +17,8 @@ resource "aws_iam_policy" "policies" {
   for_each = local.policies
 
   name        = lookup(each.value, "name")
-  path        = lookup(each.value, "path", "") == "" ? var.policy_path : lookup(each.value, "path")
-  description = lookup(each.value, "desc", "") == "" ? var.policy_desc : lookup(each.value, "desc")
+  path        = lookup(each.value, "path", null) == null ? var.policy_path : lookup(each.value, "path")
+  description = lookup(each.value, "desc", null) == null ? var.policy_desc : lookup(each.value, "desc")
   policy      = templatefile(lookup(each.value, "file"), lookup(each.value, "vars"))
 }
 
@@ -32,8 +32,8 @@ resource "aws_iam_role" "roles" {
   for_each = { for role in var.roles : role.name => role }
 
   name        = lookup(each.value, "name")
-  path        = lookup(each.value, "path", "") == "" ? var.role_path : lookup(each.value, "path")
-  description = lookup(each.value, "desc", "") == "" ? var.role_desc : lookup(each.value, "desc")
+  path        = lookup(each.value, "path", null) == null ? var.role_path : lookup(each.value, "path")
+  description = lookup(each.value, "desc", null) == null ? var.role_desc : lookup(each.value, "desc")
 
   # This policy defines who/what is allowed to use the current role
   assume_role_policy = file(lookup(each.value, "trust_policy_file"))
