@@ -51,26 +51,25 @@ locals {
   # role_policies = [
   #   {
   #     "<role-name>:<policy-name>" = {
-  #        "name" = "<policy-name>"
-  #        "path" = "<policy-path>"
-  #        "desc" = "<policy-desc>"
-  #        "file" = "<policy-file>"
+  #       "name" = "<policy-name>"
+  #       "path" = "<policy-path>"
+  #       "desc" = "<policy-desc>"
+  #       "file" = "<policy-file>"
+  #       "vars" = {key = val}
   #     }
   #   },
   # ]
-
-  _role_policies = flatten([
-    for i, role in var.roles : [
-      for j, policy in lookup(var.roles[i], "policies", {}) : {
-        "${var.roles[i]["name"]}:${var.roles[i]["policies"][j]}" = local.policies[var.roles[i]["policies"][j]]
+  rp = flatten([
+    for role in var.roles : [
+      for policy in role["policies"] : {
+        role_name   = role.name
+        policy_name = policy
+        policy      = local.policies[policy]
       }
     ]
   ])
-  # The fix to bring it into the format stated at the top of this file
-  role_policies = {
-    for i, v in local._role_policies :
-    keys(local._role_policies[i])[0] => local._role_policies[i][keys(local._role_policies[i])[0]]
-  }
+
+  role_policies = { for obj in local.rp : "${obj.role_name}:${obj.policy_name}" => obj.policy }
 }
 
 
@@ -82,33 +81,33 @@ locals {
   # This local extracts inline_policies from var.roles and combines the found policies
   # with the role names as shown below:
   #
-  #   inline_policies = [
-  #     {
-  #       "<role-name>:<policy-name>" = {
-  #         "name" = ""
-  #         "file" = ""
-  #       }
-  #     },
-  #     {
-  #       "<role-name>:<policy-name>" = {
-  #         "name" = ""
-  #         "file" = ""
-  #       }
-  #     },
-  #   ]
-
-  _inline_policies = flatten([
-    for i, role in var.roles : [
-      for j, inline_policy in lookup(var.roles[i], "inline_policies", {}) : {
-        "${var.roles[i]["name"]}:${var.roles[i]["inline_policies"][j]["name"]}" = inline_policy
+  # inline_policies = [
+  #   {
+  #     "<role-name>:<policy-name>" = {
+  #       "name" = ""
+  #       "file" = ""
+  #       "vars" = {key = val}
+  #     }
+  #   },
+  #   {
+  #     "<role-name>:<policy-name>" = {
+  #       "name" = ""
+  #       "file" = ""
+  #       "vars" = ""
+  #     }
+  #   },
+  # ]
+  ip = flatten([
+    for role in var.roles : [
+      for inline_policy in role["inline_policies"] : {
+        role_name   = role.name
+        policy_name = inline_policy["name"]
+        policy      = inline_policy
       }
     ]
   ])
-  # The fix to bring it into the format stated at the top of this file
-  inline_policies = {
-    for i, v in local._inline_policies :
-    keys(local._inline_policies[i])[0] => local._inline_policies[i][keys(local._inline_policies[i])[0]]
-  }
+
+  inline_policies = { for obj in local.ip : "${obj.role_name}:${obj.policy_name}" => obj.policy }
 }
 
 
@@ -120,25 +119,23 @@ locals {
   # This local extracts policy_arns from var.roles and combines the found policies
   # with the role names as shown below:
   #
-  #   policy_arns = [
-  #     {
-  #       "<role-name>:<policy-arn>" = "<policy-arn">
-  #     },
-  #     {
-  #       "<role-name>:<policy-arn>" = "<policy-arn">
-  #     },
-  #   ]
-
-  _policy_arns = flatten([
-    for i, role in var.roles : [
-      for j, policy_arn in lookup(var.roles[i], "policy_arns", {}) : {
-        "${var.roles[i]["name"]}:${var.roles[i]["policy_arns"][j]}" = policy_arn
+  # policy_arns = [
+  #   {
+  #     "<role-name>:<policy-arn>" = "<policy-arn">
+  #   },
+  #   {
+  #     "<role-name>:<policy-arn>" = "<policy-arn">
+  #   },
+  # ]
+  pa = flatten([
+    for role in var.roles : [
+      for policy_arn in role["policy_arns"] : {
+        role_name  = role.name
+        policy_arn = policy_arn
+        policy     = policy_arn
       }
     ]
   ])
-  # The fix to bring it into the format stated at the top of this file
-  policy_arns = {
-    for i, v in local._policy_arns :
-    keys(local._policy_arns[i])[0] => local._policy_arns[i][keys(local._policy_arns[i])[0]]
-  }
+
+  policy_arns = { for obj in local.pa : "${obj.role_name}:${obj.policy_arn}" => obj.policy }
 }
