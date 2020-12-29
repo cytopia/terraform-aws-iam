@@ -115,6 +115,19 @@ resource "aws_iam_user" "users" {
   )
 }
 
+# Add 'Active' or 'Inactive' access key to an IAM user
+resource "aws_iam_access_key" "access_key" {
+  for_each = local.user_access_keys
+
+  user    = each.key
+  pgp_key = each.value.pgp_key
+  status  = each.value.status
+
+  # Terraform has no info that aws_iam_users must be run first in order to create the users,
+  # so we must explicitly tell it.
+  depends_on = [aws_iam_user.users]
+}
+
 # Attach customer managed policies to user
 resource "aws_iam_user_policy_attachment" "policy_attachments" {
   for_each = local.user_policies

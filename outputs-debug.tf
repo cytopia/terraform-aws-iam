@@ -67,6 +67,11 @@ output "debug_local_user_policies" {
   value       = local.user_policies
 }
 
+output "debug_local_user_access_keys" {
+  description = "The transformed user access key map"
+  value       = local.user_access_keys
+}
+
 output "debug_local_user_inline_policies" {
   description = "The transformed user inline policy map"
   value       = local.user_inline_policies

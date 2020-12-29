@@ -53,6 +53,29 @@ locals {
 
 
 # -------------------------------------------------------------------------------------------------
+# User Access key transformations
+# -------------------------------------------------------------------------------------------------
+
+locals {
+  # [user_access_keys]
+  # This local transforms users into a useable user_access_keys list
+  #
+  # user_access_keys = {
+  #   "<user-name>" = {
+  #     create  = true|false
+  #     pgp_key = "<pgp-key>"        # or empty
+  #     status  = "Active|Inactive"  # or empty
+  #   },
+  #   "<user-name>" = {
+  #     create  = true|false
+  #     pgp_key = "<pgp-key>"        # or empty
+  #     status  = "Active|Inactive"  # or empty
+  #   }
+  # }
+  user_access_keys = { for u in var.users : u["name"] => u["access_key"] if u["access_key"]["create"] }
+}
+
+# -------------------------------------------------------------------------------------------------
 # Role/User Policy transformations
 # -------------------------------------------------------------------------------------------------
 

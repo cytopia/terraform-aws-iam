@@ -112,17 +112,27 @@ variable "permissions_boundaries" {
 #
 # users = [
 #   {
-#     name              = "ADMIN-USER"
-#     path              = ""
-#     policies          = []
-#     inline_policies   = []
+#     name       = "ADMIN-USER"
+#     path       = ""
+#     access_key = {
+#       create  = false
+#       pgp_key = ""
+#       status  = ""
+#     }
+#     policies        = []
+#     inline_policies = []
 #     policy_arns = [
 #       "arn:aws:iam::aws:policy/AdministratorAccess",
 #     ]
 #   },
 #   {
-#     name              = "POWER-USER"
-#     path              = ""
+#     name       = "POWER-USER"
+#     path       = ""
+#     access_key = {
+#       create  = true
+#       pgp_key = ""
+#       status  = "Active"
+#     }
 #     policies = [
 #       "assume-human-ro-billing",
 #     ]
@@ -135,8 +145,13 @@ variable "permissions_boundaries" {
 variable "users" {
   description = "A list of dictionaries defining all users."
   type = list(object({
-    name     = string       # Name of the user
-    path     = string       # Defaults to 'var.user_path' variable is set to null
+    name       = string  # Name of the user
+    path       = string  # Defaults to 'var.user_path' variable is set to null
+    access_key = object({
+      create  = bool     # Create Access key and secret?
+      pgp_key = string   # Leave empty for non or provide a b64-enc pubkey or keybase username
+      status  = string   # 'Active' or 'Inactive'
+    })
     policies = list(string) # List of names of policies (must be defined in var.policies)
     inline_policies = list(object({
       name = string      # Name of the inline policy
