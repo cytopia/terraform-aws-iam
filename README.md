@@ -172,26 +172,27 @@ Defines the permissions (Authorization)
 
 | Name | Description |
 |------|-------------|
-| created\_policies | Created customer managed IAM policies |
-| created\_role\_inline\_policy\_attachments | Attached role inline IAM policies |
-| created\_role\_policy\_arn\_attachments | Attached role IAM policy arns |
-| created\_role\_policy\_attachments | Attached role customer managed IAM policies |
-| created\_roles | Created IAM roles |
-| created\_user\_inline\_policy\_attachments | Attached user inline IAM policies |
-| created\_user\_policy\_arn\_attachments | Attached user IAM policy arns |
-| created\_user\_policy\_attachments | Attached user customer managed IAM policies |
-| created\_users | Created IAM users |
-| local\_policies | The transformed policy map |
-| local\_role\_inline\_policies | The transformed role inline policy map |
-| local\_role\_policies | The transformed role policy map |
-| local\_role\_policy\_arns | The transformed role policy arns map |
-| local\_user\_inline\_policies | The transformed user inline policy map |
-| local\_user\_policies | The transformed user policy map |
-| local\_user\_policy\_arns | The transformed user policy arns map |
-| var\_permissions\_boundaries | The defined roles list |
-| var\_policies | The transformed policy map |
-| var\_roles | The defined roles list |
-| var\_users | The defined users list |
+| debug\_local\_policies | The transformed policy map |
+| debug\_local\_role\_inline\_policies | The transformed role inline policy map |
+| debug\_local\_role\_policies | The transformed role policy map |
+| debug\_local\_role\_policy\_arns | The transformed role policy arns map |
+| debug\_local\_user\_access\_keys | The transformed user access key map |
+| debug\_local\_user\_inline\_policies | The transformed user inline policy map |
+| debug\_local\_user\_policies | The transformed user policy map |
+| debug\_local\_user\_policy\_arns | The transformed user policy arns map |
+| debug\_var\_permissions\_boundaries | The defined roles list |
+| debug\_var\_policies | The transformed policy map |
+| debug\_var\_roles | The defined roles list |
+| debug\_var\_users | The defined users list |
+| policies | Created customer managed IAM policies |
+| role\_inline\_policy\_attachments | Attached role inline IAM policies |
+| role\_policy\_arn\_attachments | Attached role IAM policy arns |
+| role\_policy\_attachments | Attached role customer managed IAM policies |
+| roles | Created IAM roles |
+| user\_inline\_policy\_attachments | Attached user inline IAM policies |
+| user\_policy\_arn\_attachments | Attached user IAM policy arns |
+| user\_policy\_attachments | Attached user customer managed IAM policies |
+| users | Created IAM users |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
