@@ -109,7 +109,7 @@ locals {
       }
     ]
   ])
-  user_policies = { for obj in local.rp : "${obj.user_name}:${obj.policy_name}" => obj.policy }
+  user_policies = { for obj in local.up : "${obj.user_name}:${obj.policy_name}" => obj.policy }
 }
 
 

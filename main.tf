@@ -126,7 +126,7 @@ resource "aws_iam_user_policy_attachment" "policy_attachments" {
   # must be run first in order to create the users,
   # so we must explicitly tell it.
   depends_on = [
-    aws_iam_role.users,
+    aws_iam_user.users,
     aws_iam_policy.policies,
   ]
 }
