@@ -5,8 +5,8 @@
 [![Terraform](https://img.shields.io/badge/Terraform--registry-aws--iam--roles-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/iam-roles/aws/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-This Terraform module can create an arbitrary number of IAM roles with policies and trusted
-entities defined as JSON or templatable json files files.
+This Terraform module can create an arbitrary number of IAM users, roles and policies. Roles can additionally be created with inline policies or policy ARN's attached and with trusted
+entities defined as JSON or templatable json files files. Users can also additionally be created with inline policies or policy ARN's attached.
 
 
 ## Important note
@@ -38,6 +38,38 @@ module "iam_roles" {
   permissions_boundaries = {
     "ROLE-DEV" = "arn:aws:iam::*:policy/perm-boundaries/default"
   }
+
+  # List of users to manage
+  users = [
+    {
+      name       = "cytopia"
+      path       = null
+      access_key = {
+        create  = true
+        pgp_key = ""
+        status  = "Active"
+      }
+      policies = [
+        "rds-authenticate",
+      ]
+      inline_policies = []
+      policy_arns = [
+        "arn:aws:iam::aws:policy/AdministratorAccess",
+      ]
+    },
+    {
+      name       = "developer"
+      path       = null
+      access_key = {
+        create  = false
+        pgp_key = ""
+        status  = ""
+      }
+      policies        = []
+      inline_policies = []
+      policy_arns     = []
+    },
+  ]
 
   # List of roles to manage
   roles = [
