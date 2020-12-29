@@ -12,8 +12,8 @@ TF_MODULES  = $(sort $(dir $(wildcard $(CURRENT_DIR)modules/*/)))
 # Container versions
 # -------------------------------------------------------------------------------------------------
 TF_VERSION      = light
-TFDOCS_VERSION  = 0.6.0
-FL_VERSION      = 0.2
+TFDOCS_VERSION  = 0.10.1
+FL_VERSION      = 0.3
 JL_VERSION      = latest-0.4
 
 
@@ -32,7 +32,7 @@ LINT_JL_ENABLE = 1
 DELIM_START = <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 DELIM_CLOSE = <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 # What arguments to append to terraform-docs command
-TFDOCS_ARGS = --sort-inputs-by-required --with-aggregate-type-defaults
+TFDOCS_ARGS = --sort-by-required
 
 
 # -------------------------------------------------------------------------------------------------
