@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 This Terraform module can create an arbitrary number of IAM users, roles and policies. Roles can additionally be created with inline policies or policy ARN's attached and with trusted
-entities defined as JSON or templatable json files files. Users can also additionally be created with inline policies or policy ARN's attached.
+entities defined as JSON or templatable json files files. Users can also additionally be created with inline policies or policy ARN's attached as well as their access key rotation can be fully managed.
 
 
 ## Important note
@@ -42,30 +42,28 @@ module "iam_roles" {
   # List of users to manage
   users = [
     {
-      name       = "cytopia"
-      path       = null
-      access_key = {
-        create  = true
-        pgp_key = ""
-        status  = "Active"
-      }
-      policies = [
-        "rds-authenticate",
-      ]
+      name            = "admin"
+      path            = null
+      access_keys     = []
+      policies        = []
       inline_policies = []
       policy_arns = [
         "arn:aws:iam::aws:policy/AdministratorAccess",
       ]
     },
     {
-      name       = "developer"
-      path       = null
-      access_key = {
-        create  = false
-        pgp_key = ""
-        status  = ""
-      }
-      policies        = []
+      name        = "developer"
+      path        = null
+      access_keys = [
+        {
+          name    = "key-1"
+          pgp_key = ""
+          status  = "Active"
+        }
+      ]
+      policies    = [
+        "rds-authenticate",
+      ]
       inline_policies = []
       policy_arns     = []
     },
@@ -188,7 +186,7 @@ Defines the permissions (Authorization)
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | roles | A list of dictionaries defining all roles. | <pre>list(object({<br>    name              = string       # Name of the role<br>    path              = string       # Defaults to 'var.role_path' variable is set to null<br>    desc              = string       # Defaults to 'var.role_desc' variable is set to null<br>    trust_policy_file = string       # Path to file of trust/assume policy<br>    policies          = list(string) # List of names of policies (must be defined in var.policies)<br>    inline_policies = list(object({<br>      name = string      # Name of the inline policy<br>      file = string      # Path to json or json.tmpl file of policy<br>      vars = map(string) # Policy template variables {key = val, ...}<br>    }))<br>    policy_arns = list(string) # List of existing policy ARN's<br>  }))</pre> | n/a | yes |
-| users | A list of dictionaries defining all users. | <pre>list(object({<br>    name       = string  # Name of the user<br>    path       = string  # Defaults to 'var.user_path' variable is set to null<br>    access_key = object({<br>      create  = bool     # Create Access key and secret?<br>      pgp_key = string   # Leave empty for non or provide a b64-enc pubkey or keybase username<br>      status  = string   # 'Active' or 'Inactive'<br>    })<br>    policies = list(string) # List of names of policies (must be defined in var.policies)<br>    inline_policies = list(object({<br>      name = string      # Name of the inline policy<br>      file = string      # Path to json or json.tmpl file of policy<br>      vars = map(string) # Policy template variables {key = val, ...}<br>    }))<br>    policy_arns = list(string) # List of existing policy ARN's<br>  }))</pre> | n/a | yes |
+| users | A list of dictionaries defining all users. | <pre>list(object({<br>    name = string # Name of the user<br>    path = string # Defaults to 'var.user_path' variable is set to null<br>    access_keys = list(object({<br>      name    = string # IaC identifier for first or second IAM access key (not used on AWS)<br>      pgp_key = string # Leave empty for non or provide a b64-enc pubkey or keybase username<br>      status  = string # 'Active' or 'Inactive'<br>    }))<br>    policies = list(string) # List of names of policies (must be defined in var.policies)<br>    inline_policies = list(object({<br>      name = string      # Name of the inline policy<br>      file = string      # Path to json or json.tmpl file of policy<br>      vars = map(string) # Policy template variables {key = val, ...}<br>    }))<br>    policy_arns = list(string) # List of existing policy ARN's<br>  }))</pre> | n/a | yes |
 | permissions\_boundaries | A map of strings containing ARN's of policies to attach as permissions boundaries to roles. | `map(string)` | `{}` | no |
 | policies | A list of dictionaries defining all policies. | <pre>list(object({<br>    name = string      # Name of the policy<br>    path = string      # Defaults to 'var.policy_path' variable is set to null<br>    desc = string      # Defaults to 'var.policy_desc' variable is set to null<br>    file = string      # Path to json or json.tmpl file of policy<br>    vars = map(string) # Policy template variables {key: val, ...}<br>  }))</pre> | `[]` | no |
 | policy\_desc | The default description of the policy. | `string` | `"Managed by Terraform"` | no |

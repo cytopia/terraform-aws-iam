@@ -60,19 +60,35 @@ locals {
   # [user_access_keys]
   # This local transforms users into a useable user_access_keys list
   #
-  # user_access_keys = {
-  #   "<user-name>" = {
-  #     create  = true|false
-  #     pgp_key = "<pgp-key>"        # or empty
-  #     status  = "Active|Inactive"  # or empty
+  # user_access_keys = [
+  #   {
+  #     "<user-name>:<key-name>" = {
+  #       user_name  = "<user-name>"      # required to distinguish between one of the two keys
+  #       key_name   = "<key-name>"       # required to distinguish between one of the two keys
+  #       pgp_key    = "<pgp-key>"        # or empty
+  #       status     = "Active|Inactive"  # or empty
+  #     },
   #   },
-  #   "<user-name>" = {
-  #     create  = true|false
-  #     pgp_key = "<pgp-key>"        # or empty
-  #     status  = "Active|Inactive"  # or empty
-  #   }
-  # }
-  user_access_keys = { for u in var.users : u["name"] => u["access_key"] if u["access_key"]["create"] }
+  #   {
+  #     "<user-name>:<key-name>" = {
+  #       user_name  = "<user-name>"      # required to distinguish between one of the two keys
+  #       key_name   = "<key-name>"       # required to distinguish between one of the two keys
+  #       pgp_key    = "<pgp-key>"        # or empty
+  #       status     = "Active|Inactive"  # or empty
+  #     },
+  #   },
+  # ]
+  uak = flatten([
+    for user in var.users : [
+      for user_access_key in user["access_keys"] : {
+        user_name = user.name
+        key_name  = user_access_key.name
+        pgp_key   = user_access_key.pgp_key
+        status    = user_access_key.status
+      }
+    ]
+  ])
+  user_access_keys = { for obj in local.uak : "${obj.user_name}:${obj.key_name}" => obj }
 }
 
 # -------------------------------------------------------------------------------------------------

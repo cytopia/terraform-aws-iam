@@ -119,7 +119,7 @@ resource "aws_iam_user" "users" {
 resource "aws_iam_access_key" "access_key" {
   for_each = local.user_access_keys
 
-  user    = each.key
+  user    = split(":", each.key)[0]
   pgp_key = each.value.pgp_key
   status  = each.value.status
 
