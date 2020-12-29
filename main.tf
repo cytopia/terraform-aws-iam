@@ -9,7 +9,7 @@ terraform {
 
 
 # -------------------------------------------------------------------------------------------------
-# Create defined Policies
+# 1. Policies
 # -------------------------------------------------------------------------------------------------
 
 # Create customer managed policies
@@ -24,7 +24,7 @@ resource "aws_iam_policy" "policies" {
 
 
 # -------------------------------------------------------------------------------------------------
-# Create Roles
+# 2. Roles
 # -------------------------------------------------------------------------------------------------
 
 # Create roles
@@ -43,22 +43,16 @@ resource "aws_iam_role" "roles" {
   permissions_boundary = lookup(var.permissions_boundaries, each.key, "")
 
   # Allow session for X seconds
-  max_session_duration  = var.max_session_duration
-  force_detach_policies = var.force_detach_policies
+  max_session_duration  = var.role_max_session_duration
+  force_detach_policies = var.role_force_detach_policies
 
   tags = merge(
     map("Name", lookup(each.value, "name")),
     var.tags
   )
-
 }
 
-
-# -------------------------------------------------------------------------------------------------
-# Attach Policies to Role
-# -------------------------------------------------------------------------------------------------
-
-# Attach customer managed policies
+# Attach customer managed policies to roles
 resource "aws_iam_role_policy_attachment" "policy_attachments" {
   for_each = local.role_policies
 
@@ -74,9 +68,9 @@ resource "aws_iam_role_policy_attachment" "policy_attachments" {
   ]
 }
 
-# Attach policy ARNs
+# Attach policy ARNs to roles
 resource "aws_iam_role_policy_attachment" "policy_arn_attachments" {
-  for_each = local.policy_arns
+  for_each = local.role_policy_arns
 
   role       = replace(each.key, format(":%s", each.value), "")
   policy_arn = each.value
@@ -86,9 +80,9 @@ resource "aws_iam_role_policy_attachment" "policy_arn_attachments" {
   depends_on = [aws_iam_role.roles]
 }
 
-# Attach inline policies
+# Attach inline policies to roles
 resource "aws_iam_role_policy" "inline_policy_attachments" {
-  for_each = local.inline_policies
+  for_each = local.role_inline_policies
 
   name   = each.value.name
   role   = replace(each.key, format(":%s", each.value.name), "")
@@ -97,4 +91,67 @@ resource "aws_iam_role_policy" "inline_policy_attachments" {
   # Terraform has no info that aws_iam_roles must be run first in order to create the roles,
   # so we must explicitly tell it.
   depends_on = [aws_iam_role.roles]
+}
+
+
+# -------------------------------------------------------------------------------------------------
+# 3. Users
+# -------------------------------------------------------------------------------------------------
+
+# Create users
+resource "aws_iam_user" "users" {
+  for_each = { for user in var.users : user.name => user }
+
+  name = lookup(each.value, "name")
+  path = lookup(each.value, "path", null) == null ? var.user_path : lookup(each.value, "path")
+
+  # The boundary defines the maximum allowed permissions which cannot exceed.
+  # Even if the policy has higher permission, the boundary sets the final limit
+  permissions_boundary = lookup(var.permissions_boundaries, each.key, "")
+
+  tags = merge(
+    map("Name", lookup(each.value, "name")),
+    var.tags
+  )
+}
+
+# Attach customer managed policies to user
+resource "aws_iam_user_policy_attachment" "policy_attachments" {
+  for_each = local.user_policies
+
+  user       = replace(each.key, format(":%s", each.value.name), "")
+  policy_arn = aws_iam_policy.policies[each.value.name].arn
+
+  # Terraform has no info that aws_iam_users and aws_iam_policies
+  # must be run first in order to create the users,
+  # so we must explicitly tell it.
+  depends_on = [
+    aws_iam_role.users,
+    aws_iam_policy.policies,
+  ]
+}
+
+# Attach policy ARNs to user
+resource "aws_iam_user_policy_attachment" "policy_arn_attachments" {
+  for_each = local.user_policy_arns
+
+  user       = replace(each.key, format(":%s", each.value), "")
+  policy_arn = each.value
+
+  # Terraform has no info that aws_iam_users must be run first in order to create the users,
+  # so we must explicitly tell it.
+  depends_on = [aws_iam_user.users]
+}
+
+# Attach inline policies to user
+resource "aws_iam_user_policy" "inline_policy_attachments" {
+  for_each = local.user_inline_policies
+
+  name   = each.value.name
+  user   = replace(each.key, format(":%s", each.value.name), "")
+  policy = templatefile(lookup(each.value, "file"), lookup(each.value, "vars"))
+
+  # Terraform has no info that aws_iam_users must be run first in order to create the users,
+  # so we must explicitly tell it.
+  depends_on = [aws_iam_user.users]
 }
