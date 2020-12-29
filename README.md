@@ -11,7 +11,7 @@ entities defined as JSON or templatable json files files. Users can also additio
 
 ## Important note
 
-When creating an IAM user with an `Inactive` access key it is initially create with access key set to `Active`. You will have to run it a second time in order to deactivate the access key.
+When creating an IAM user with an `Inactive` access key it is initially created with access key set to `Active`. You will have to run it a second time in order to deactivate the access key.
 This is either an issue with the terraform resource `aws_iam_access_key` or with the AWS api itself.
 
 
