@@ -34,19 +34,15 @@ module "iam_roles" {
     },
   ]
 
-  # Map of permissions boundaries to attach to specific roles
-  permissions_boundaries = {
-    "ROLE-DEV" = "arn:aws:iam::*:policy/perm-boundaries/default"
-  }
-
   # List of users to manage
   users = [
     {
-      name            = "admin"
-      path            = null
-      access_keys     = []
-      policies        = []
-      inline_policies = []
+      name                 = "admin"
+      path                 = null
+      access_keys          = []
+      permissions_boundary = null
+      policies             = []
+      inline_policies      = []
       policy_arns = [
         "arn:aws:iam::aws:policy/AdministratorAccess",
       ]
@@ -61,6 +57,7 @@ module "iam_roles" {
           status  = "Active"
         }
       ]
+      permissions_boundary = "arn:aws:iam::aws:policy/PowerUserAccess"
       policies    = [
         "rds-authenticate",
       ]
@@ -72,21 +69,23 @@ module "iam_roles" {
   # List of roles to manage
   roles = [
     {
-      name              = "ROLE-ADMIN"
-      path              = ""
-      desc              = ""
-      trust_policy_file = "trust-policies/admin.json"
-      policies          = []
-      inline_policies   = []
+      name                 = "ROLE-ADMIN"
+      path                 = ""
+      desc                 = ""
+      trust_policy_file    = "trust-policies/admin.json"
+      permissions_boundary = null
+      policies             = []
+      inline_policies      = []
       policy_arns = [
         "arn:aws:iam::aws:policy/AdministratorAccess",
       ]
     },
     {
-      name              = "ROLE-DEV"
-      path              = ""
-      desc              = ""
-      trust_policy_file = "trust-policies/dev.json"
+      name                 = "ROLE-DEV"
+      path                 = ""
+      desc                 = ""
+      trust_policy_file    = "trust-policies/dev.json"
+      permissions_boundary = "arn:aws:iam::aws:policy/PowerUserAccess"
       policies = [
         "ro-billing",
       ]
@@ -185,9 +184,8 @@ Defines the permissions (Authorization)
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| roles | A list of dictionaries defining all roles. | <pre>list(object({<br>    name              = string       # Name of the role<br>    path              = string       # Defaults to 'var.role_path' variable is set to null<br>    desc              = string       # Defaults to 'var.role_desc' variable is set to null<br>    trust_policy_file = string       # Path to file of trust/assume policy<br>    policies          = list(string) # List of names of policies (must be defined in var.policies)<br>    inline_policies = list(object({<br>      name = string      # Name of the inline policy<br>      file = string      # Path to json or json.tmpl file of policy<br>      vars = map(string) # Policy template variables {key = val, ...}<br>    }))<br>    policy_arns = list(string) # List of existing policy ARN's<br>  }))</pre> | n/a | yes |
-| users | A list of dictionaries defining all users. | <pre>list(object({<br>    name = string # Name of the user<br>    path = string # Defaults to 'var.user_path' variable is set to null<br>    access_keys = list(object({<br>      name    = string # IaC identifier for first or second IAM access key (not used on AWS)<br>      pgp_key = string # Leave empty for non or provide a b64-enc pubkey or keybase username<br>      status  = string # 'Active' or 'Inactive'<br>    }))<br>    policies = list(string) # List of names of policies (must be defined in var.policies)<br>    inline_policies = list(object({<br>      name = string      # Name of the inline policy<br>      file = string      # Path to json or json.tmpl file of policy<br>      vars = map(string) # Policy template variables {key = val, ...}<br>    }))<br>    policy_arns = list(string) # List of existing policy ARN's<br>  }))</pre> | n/a | yes |
-| permissions\_boundaries | A map of strings containing ARN's of policies to attach as permissions boundaries to roles. | `map(string)` | `{}` | no |
+| roles | A list of dictionaries defining all roles. | <pre>list(object({<br>    name                 = string       # Name of the role<br>    path                 = string       # Defaults to 'var.role_path' variable is set to null<br>    desc                 = string       # Defaults to 'var.role_desc' variable is set to null<br>    trust_policy_file    = string       # Path to file of trust/assume policy<br>    permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)<br>    policies             = list(string) # List of names of policies (must be defined in var.policies)<br>    inline_policies      = list(object({<br>      name = string      # Name of the inline policy<br>      file = string      # Path to json or json.tmpl file of policy<br>      vars = map(string) # Policy template variables {key = val, ...}<br>    }))<br>    policy_arns = list(string) # List of existing policy ARN's<br>  }))</pre> | n/a | yes |
+| users | A list of dictionaries defining all users. | <pre>list(object({<br>    name = string # Name of the user<br>    path = string # Defaults to 'var.user_path' variable is set to null<br>    access_keys = list(object({<br>      name    = string # IaC identifier for first or second IAM access key (not used on AWS)<br>      pgp_key = string # Leave empty for non or provide a b64-enc pubkey or keybase username<br>      status  = string # 'Active' or 'Inactive'<br>    }))<br>    permissions_boundary = string # ARN to a policy used as permissions boundary (or null/empty)<br>    policies = list(string)       # List of names of policies (must be defined in var.policies)<br>    inline_policies = list(object({<br>      name = string      # Name of the inline policy<br>      file = string      # Path to json or json.tmpl file of policy<br>      vars = map(string) # Policy template variables {key = val, ...}<br>    }))<br>    policy_arns = list(string) # List of existing policy ARN's<br>  }))</pre> | n/a | yes |
 | policies | A list of dictionaries defining all policies. | <pre>list(object({<br>    name = string      # Name of the policy<br>    path = string      # Defaults to 'var.policy_path' variable is set to null<br>    desc = string      # Defaults to 'var.policy_desc' variable is set to null<br>    file = string      # Path to json or json.tmpl file of policy<br>    vars = map(string) # Policy template variables {key: val, ...}<br>  }))</pre> | `[]` | no |
 | policy\_desc | The default description of the policy. | `string` | `"Managed by Terraform"` | no |
 | policy\_path | The default path under which to create the policy if not specified in the policies list. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure. | `string` | `"/"` | no |
@@ -210,7 +208,6 @@ Defines the permissions (Authorization)
 | debug\_local\_user\_inline\_policies | The transformed user inline policy map |
 | debug\_local\_user\_policies | The transformed user policy map |
 | debug\_local\_user\_policy\_arns | The transformed user policy arns map |
-| debug\_var\_permissions\_boundaries | The defined roles list |
 | debug\_var\_policies | The transformed policy map |
 | debug\_var\_roles | The defined roles list |
 | debug\_var\_users | The defined users list |

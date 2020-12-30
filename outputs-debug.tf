@@ -17,11 +17,6 @@ output "debug_var_users" {
   value       = var.users
 }
 
-output "debug_var_permissions_boundaries" {
-  description = "The defined roles list"
-  value       = var.permissions_boundaries
-}
-
 output "debug_var_policies" {
   description = "The transformed policy map"
   value       = var.policies

@@ -40,7 +40,7 @@ resource "aws_iam_role" "roles" {
 
   # The boundary defines the maximum allowed permissions which cannot exceed.
   # Even if the policy has higher permission, the boundary sets the final limit
-  permissions_boundary = lookup(var.permissions_boundaries, each.key, "")
+  permissions_boundary = each.value.permissions_boundary
 
   # Allow session for X seconds
   max_session_duration  = var.role_max_session_duration
@@ -107,7 +107,7 @@ resource "aws_iam_user" "users" {
 
   # The boundary defines the maximum allowed permissions which cannot exceed.
   # Even if the policy has higher permission, the boundary sets the final limit
-  permissions_boundary = lookup(var.permissions_boundaries, each.key, "")
+  permissions_boundary = each.value.permissions_boundary
 
   tags = merge(
     map("Name", lookup(each.value, "name")),
