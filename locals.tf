@@ -53,11 +53,50 @@ locals {
 
 
 # -------------------------------------------------------------------------------------------------
-# Role Policy transformations
+# User Access key transformations
 # -------------------------------------------------------------------------------------------------
 
 locals {
+  # [user_access_keys]
+  # This local transforms users into a useable user_access_keys list
+  #
+  # user_access_keys = [
+  #   {
+  #     "<user-name>:<key-name>" = {
+  #       user_name  = "<user-name>"      # required to distinguish between one of the two keys
+  #       key_name   = "<key-name>"       # required to distinguish between one of the two keys
+  #       pgp_key    = "<pgp-key>"        # or empty
+  #       status     = "Active|Inactive"  # or empty
+  #     },
+  #   },
+  #   {
+  #     "<user-name>:<key-name>" = {
+  #       user_name  = "<user-name>"      # required to distinguish between one of the two keys
+  #       key_name   = "<key-name>"       # required to distinguish between one of the two keys
+  #       pgp_key    = "<pgp-key>"        # or empty
+  #       status     = "Active|Inactive"  # or empty
+  #     },
+  #   },
+  # ]
+  uak = flatten([
+    for user in var.users : [
+      for user_access_key in user["access_keys"] : {
+        user_name = user.name
+        key_name  = user_access_key.name
+        pgp_key   = user_access_key.pgp_key
+        status    = user_access_key.status
+      }
+    ]
+  ])
+  user_access_keys = { for obj in local.uak : "${obj.user_name}:${obj.key_name}" => obj }
+}
 
+# -------------------------------------------------------------------------------------------------
+# Role/User Policy transformations
+# -------------------------------------------------------------------------------------------------
+
+locals {
+  # [role_policies]
   # This local combines var.roles and var.policies and creates its own list as shown below:
   #
   # role_policies = [
@@ -82,20 +121,47 @@ locals {
       }
     ]
   ])
-
   role_policies = { for obj in local.rp : "${obj.role_name}:${obj.policy_name}" => obj.policy }
+
+  # [user_policies]
+  # This local combines var.users and var.policies and creates its own list as shown below:
+  #
+  # user_policies = [
+  #   {
+  #     "<user-name>:<policy-name>" = {
+  #       name = "<policy-name>"
+  #       path = "<policy-path>"
+  #       desc = "<policy-desc>"
+  #       file = "<policy-file>"
+  #       vars = {
+  #         key = "val",
+  #       }
+  #     }
+  #   },
+  # ]
+  up = flatten([
+    for user in var.users : [
+      for policy in user["policies"] : {
+        user_name   = user.name
+        policy_name = policy
+        policy      = local.policies[policy]
+      }
+    ]
+  ])
+  user_policies = { for obj in local.up : "${obj.user_name}:${obj.policy_name}" => obj.policy }
 }
 
 
 # -------------------------------------------------------------------------------------------------
-# Inline Policy transformations
+# Role/User Inline Policy transformations
 # -------------------------------------------------------------------------------------------------
 
 locals {
-  # This local extracts inline_policies from var.roles and combines the found policies
+  # [role_inline_policies]
+  # This local extracts inline_role_policies from var.roles and combines the found policies
   # with the role names as shown below:
   #
-  # inline_policies = [
+  # role_inline_policies = [
   #   {
   #     "<role-name>:<policy-name>" = {
   #       name = "<policy-name>"
@@ -115,7 +181,7 @@ locals {
   #     }
   #   },
   # ]
-  ip = flatten([
+  rip = flatten([
     for role in var.roles : [
       for inline_policy in role["inline_policies"] : {
         role_name   = role.name
@@ -124,20 +190,54 @@ locals {
       }
     ]
   ])
+  role_inline_policies = { for obj in local.rip : "${obj.role_name}:${obj.policy_name}" => obj.policy }
 
-  inline_policies = { for obj in local.ip : "${obj.role_name}:${obj.policy_name}" => obj.policy }
+  # [user_inline_policies]
+  # This local extracts inline_user_policies from var.users and combines the found policies
+  # with the user names as shown below:
+  #
+  # user_inline_policies = [
+  #   {
+  #     "<user-name>:<policy-name>" = {
+  #       name = "<policy-name>"
+  #       file = "<policy-file>"
+  #       vars = {
+  #         key = "val",
+  #       }
+  #     }
+  #   },
+  #   {
+  #     "<user-name>:<policy-name>" = {
+  #       name = "<policy-name>"
+  #       file = "<policy-file>"
+  #       vars = {
+  #         key = "val",
+  #       }
+  #     }
+  #   },
+  # ]
+  uip = flatten([
+    for user in var.users : [
+      for inline_policy in user["inline_policies"] : {
+        user_name   = user.name
+        policy_name = inline_policy["name"]
+        policy      = inline_policy
+      }
+    ]
+  ])
+  user_inline_policies = { for obj in local.uip : "${obj.user_name}:${obj.policy_name}" => obj.policy }
 }
 
 
 # -------------------------------------------------------------------------------------------------
-# Policy Arn transformations
+# Role/User Policy Arn transformations
 # -------------------------------------------------------------------------------------------------
 
 locals {
   # This local extracts policy_arns from var.roles and combines the found policies
   # with the role names as shown below:
   #
-  # policy_arns = [
+  # role_policy_arns = [
   #   {
   #     "<role-name>:<policy-arn>" = "<policy-arn>"
   #   },
@@ -145,7 +245,7 @@ locals {
   #     "<role-name>:<policy-arn>" = "<policy-arn>"
   #   },
   # ]
-  pa = flatten([
+  rpa = flatten([
     for role in var.roles : [
       for policy_arn in role["policy_arns"] : {
         role_name  = role.name
@@ -154,6 +254,27 @@ locals {
       }
     ]
   ])
+  role_policy_arns = { for obj in local.rpa : "${obj.role_name}:${obj.policy_arn}" => obj.policy }
 
-  policy_arns = { for obj in local.pa : "${obj.role_name}:${obj.policy_arn}" => obj.policy }
+  # This local extracts policy_arns from var.users and combines the found policies
+  # with the user names as shown below:
+  #
+  # user_policy_arns = [
+  #   {
+  #     "<user-name>:<policy-arn>" = "<policy-arn>"
+  #   },
+  #   {
+  #     "<user-name>:<policy-arn>" = "<policy-arn>"
+  #   },
+  # ]
+  upa = flatten([
+    for user in var.users : [
+      for policy_arn in user["policy_arns"] : {
+        user_name  = user.name
+        policy_arn = policy_arn
+        policy     = policy_arn
+      }
+    ]
+  ])
+  user_policy_arns = { for obj in local.upa : "${obj.user_name}:${obj.policy_arn}" => obj.policy }
 }
