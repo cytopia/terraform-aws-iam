@@ -50,21 +50,23 @@ variable "policies" {
 #
 # roles = [
 #   {
-#     name              = "ASSUME-ADMIN"
-#     path              = ""
-#     desc              = ""
-#     trust_policy_file = "trust-policies/eng-ops.json"
-#     policies          = []
-#     inline_policies   = []
+#     name                 = "ASSUME-ADMIN"
+#     path                 = ""
+#     desc                 = ""
+#     trust_policy_file    = "trust-policies/eng-ops.json"
+#     permissions_boundary = null
+#     policies             = []
+#     inline_policies      = []
 #     policy_arns = [
 #       "arn:aws:iam::aws:policy/AdministratorAccess",
 #     ]
 #   },
 #   {
-#     name              = "ASSUME-DEV"
-#     path              = ""
-#     desc              = ""
-#     trust_policy_file = "trust-policies/eng-dev.json"
+#     name                 = "ASSUME-DEV"
+#     path                 = ""
+#     desc                 = ""
+#     trust_policy_file    = "trust-policies/eng-dev.json"
+#     permissions_boundary = "arn:aws:iam::aws:policy/my-boundary"
 #     policies = [
 #       "assume-human-ro-billing",
 #     ]
@@ -77,11 +79,12 @@ variable "policies" {
 variable "roles" {
   description = "A list of dictionaries defining all roles."
   type = list(object({
-    name              = string       # Name of the role
-    path              = string       # Defaults to 'var.role_path' variable is set to null
-    desc              = string       # Defaults to 'var.role_desc' variable is set to null
-    trust_policy_file = string       # Path to file of trust/assume policy
-    policies          = list(string) # List of names of policies (must be defined in var.policies)
+    name                 = string       # Name of the role
+    path                 = string       # Defaults to 'var.role_path' variable is set to null
+    desc                 = string       # Defaults to 'var.role_desc' variable is set to null
+    trust_policy_file    = string       # Path to file of trust/assume policy
+    permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)
+    policies             = list(string) # List of names of policies (must be defined in var.policies)
     inline_policies = list(object({
       name = string      # Name of the inline policy
       file = string      # Path to json or json.tmpl file of policy
@@ -89,18 +92,6 @@ variable "roles" {
     }))
     policy_arns = list(string) # List of existing policy ARN's
   }))
-}
-
-
-# Example permissions_boundaries definition:
-#
-# permissions_boundaries = {
-#   <role-name> = "arn:aws:iam::1234567890:policy/test-perm-boundaries/test-default"
-# }
-variable "permissions_boundaries" {
-  description = "A map of strings containing ARN's of policies to attach as permissions boundaries to roles."
-  type        = map(string)
-  default     = {}
 }
 
 
@@ -126,6 +117,7 @@ variable "permissions_boundaries" {
 #         status  = ""
 #       }
 #     ]
+#     permissions_boundary = null
 #     policies        = []
 #     inline_policies = []
 #     policy_arns = [
@@ -133,9 +125,10 @@ variable "permissions_boundaries" {
 #     ]
 #   },
 #   {
-#     name       = "POWER-USER"
-#     path       = ""
-#     access_keys = []
+#     name                 = "POWER-USER"
+#     path                 = ""
+#     access_keys          = []
+#     permissions_boundary = "arn:aws:iam::aws:policy/my-boundary"
 #     policies = [
 #       "assume-human-ro-billing",
 #     ]
@@ -155,7 +148,8 @@ variable "users" {
       pgp_key = string # Leave empty for non or provide a b64-enc pubkey or keybase username
       status  = string # 'Active' or 'Inactive'
     }))
-    policies = list(string) # List of names of policies (must be defined in var.policies)
+    permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)
+    policies             = list(string) # List of names of policies (must be defined in var.policies)
     inline_policies = list(object({
       name = string      # Name of the inline policy
       file = string      # Path to json or json.tmpl file of policy
