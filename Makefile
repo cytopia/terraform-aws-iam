@@ -32,7 +32,7 @@ LINT_JL_ENABLE = 1
 DELIM_START = <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 DELIM_CLOSE = <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 # What arguments to append to terraform-docs command
-TFDOCS_ARGS = --sort-by-required
+TFDOCS_ARGS = --sort=false
 
 
 # -------------------------------------------------------------------------------------------------

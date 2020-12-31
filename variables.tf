@@ -1,4 +1,67 @@
 # -------------------------------------------------------------------------------------------------
+# Account setting transformations
+# -------------------------------------------------------------------------------------------------
+
+variable "account_alias" {
+  description = "Assign the account alias for the AWS Account or leave null to not manage it."
+  type        = string
+  default     = null
+}
+
+variable "account_pass_policy" {
+  description = "Manages Password Policy for the AWS Account."
+  type = object({
+    manage                         = bool # Set to true, to manage the pass policy
+    allow_users_to_change_password = bool
+    hard_expiry                    = bool
+    max_password_age               = number
+    minimum_password_length        = number
+    password_reuse_prevention      = number
+    require_lowercase_characters   = bool
+    require_numbers                = bool
+    require_symbols                = bool
+    require_uppercase_characters   = bool
+  })
+  default = {
+    manage                         = false
+    allow_users_to_change_password = null
+    hard_expiry                    = null
+    max_password_age               = null
+    minimum_password_length        = null
+    password_reuse_prevention      = null
+    require_lowercase_characters   = null
+    require_numbers                = null
+    require_symbols                = null
+    require_uppercase_characters   = null
+  }
+}
+
+
+# -------------------------------------------------------------------------------------------------
+# Identity Providers
+# -------------------------------------------------------------------------------------------------
+
+variable "providers_saml" {
+  description = "A list of dictionaries defining saml providers."
+  type = list(object({
+    name = string
+    file = string
+  }))
+  default = []
+}
+
+variable "providers_oidc" {
+  description = "A list of dictionaries defining openid connect providers."
+  type = list(object({
+    url             = string
+    client_id_list  = list(string)
+    thumbprint_list = list(string)
+  }))
+  default = []
+}
+
+
+# -------------------------------------------------------------------------------------------------
 # Policy definition
 # -------------------------------------------------------------------------------------------------
 
@@ -43,55 +106,23 @@ variable "policies" {
 
 
 # -------------------------------------------------------------------------------------------------
-# Role definition
+# Group definition
 # -------------------------------------------------------------------------------------------------
 
-# Example role definition:
-#
-# roles = [
-#   {
-#     name                 = "ASSUME-ADMIN"
-#     path                 = ""
-#     desc                 = ""
-#     trust_policy_file    = "trust-policies/eng-ops.json"
-#     permissions_boundary = null
-#     policies             = []
-#     inline_policies      = []
-#     policy_arns = [
-#       "arn:aws:iam::aws:policy/AdministratorAccess",
-#     ]
-#   },
-#   {
-#     name                 = "ASSUME-DEV"
-#     path                 = ""
-#     desc                 = ""
-#     trust_policy_file    = "trust-policies/eng-dev.json"
-#     permissions_boundary = "arn:aws:iam::aws:policy/my-boundary"
-#     policies = [
-#       "assume-human-ro-billing",
-#     ]
-#     inline_policies = []
-#     policy_arns = [
-#       "arn:aws:iam::aws:policy/PowerUserAccess",
-#     ]
-#   },
-# ]
-variable "roles" {
-  description = "A list of dictionaries defining all roles."
+variable "groups" {
+  description = "A list of dictionaries defining all groups."
   type = list(object({
-    name                 = string       # Name of the role
-    path                 = string       # Defaults to 'var.role_path' variable is set to null
-    desc                 = string       # Defaults to 'var.role_desc' variable is set to null
-    trust_policy_file    = string       # Path to file of trust/assume policy
-    permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)
-    policies             = list(string) # List of names of policies (must be defined in var.policies)
+    name        = string       # Name of the group
+    path        = string       # Defaults to 'var.group_path' if variable is set to null
+    policies    = list(string) # List of names of policies (must be defined in var.policies)
+    policy_arns = list(string) # List of existing policy ARN's
     inline_policies = list(object({
       name = string      # Name of the inline policy
       file = string      # Path to json or json.tmpl file of policy
       vars = map(string) # Policy template variables {key = val, ...}
     }))
-    policy_arns = list(string) # List of existing policy ARN's
   }))
+  default = []
 }
 
 
@@ -105,6 +136,7 @@ variable "roles" {
 #   {
 #     name       = "ADMIN-USER"
 #     path       = ""
+#     groups     = []
 #     access_keys = [
 #       {
 #         name    = "key1"
@@ -119,30 +151,35 @@ variable "roles" {
 #     ]
 #     permissions_boundary = null
 #     policies        = []
-#     inline_policies = []
 #     policy_arns = [
 #       "arn:aws:iam::aws:policy/AdministratorAccess",
 #     ]
+#     inline_policies = []
 #   },
 #   {
-#     name                 = "POWER-USER"
-#     path                 = ""
+#     name   = "POWER-USER"
+#     path   = ""
+#     groups = [
+#       "groupname1",
+#       "groupname2",
+#     ]
 #     access_keys          = []
 #     permissions_boundary = "arn:aws:iam::aws:policy/my-boundary"
 #     policies = [
 #       "assume-human-ro-billing",
 #     ]
-#     inline_policies = []
 #     policy_arns = [
 #       "arn:aws:iam::aws:policy/PowerUserAccess",
 #     ]
+#     inline_policies = []
 #   },
 # ]
 variable "users" {
   description = "A list of dictionaries defining all users."
   type = list(object({
-    name = string # Name of the user
-    path = string # Defaults to 'var.user_path' variable is set to null
+    name   = string       # Name of the user
+    path   = string       # Defaults to 'var.user_path' variable is set to null
+    groups = list(string) # List of group names to add this user to
     access_keys = list(object({
       name    = string # IaC identifier for first or second IAM access key (not used on AWS)
       pgp_key = string # Leave empty for non or provide a b64-enc pubkey or keybase username
@@ -150,13 +187,72 @@ variable "users" {
     }))
     permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)
     policies             = list(string) # List of names of policies (must be defined in var.policies)
+    policy_arns          = list(string) # List of existing policy ARN's
     inline_policies = list(object({
       name = string      # Name of the inline policy
       file = string      # Path to json or json.tmpl file of policy
       vars = map(string) # Policy template variables {key = val, ...}
     }))
-    policy_arns = list(string) # List of existing policy ARN's
   }))
+  default = []
+}
+
+
+# -------------------------------------------------------------------------------------------------
+# Role definition
+# -------------------------------------------------------------------------------------------------
+
+# Example role definition:
+#
+# roles = [
+#   {
+#     name                 = "ASSUME-ADMIN"
+#     path                 = ""
+#     desc                 = "Description"
+#     trust_policy_file    = "trust-policies/eng-ops.json"
+#     permissions_boundary = null
+#     policies             = []
+#     policy_arns          = ["arn:aws:iam::aws:policy/AdministratorAccess"],
+#     inline_policies      = []
+#   },
+#   {
+#     name                 = "ASSUME-DEV"
+#     path                 = null
+#     desc                 = null
+#     trust_policy_file    = "trust-policies/eng-dev.json"
+#     permissions_boundary = "arn:aws:iam::aws:policy/my-boundary"
+#     policies = [
+#       "assume-human-ro-billing",
+#     ]
+#     policy_arns = [
+#       "arn:aws:iam::aws:policy/PowerUserAccess",
+#     ]
+#     inline_policies = [
+#       {
+#         name = "mypolicy"
+#         file = "data/policy.json"
+#         vars = {}
+#       }
+#     ]
+#   },
+# ]
+variable "roles" {
+  description = "A list of dictionaries defining all roles."
+  type = list(object({
+    name                 = string       # Name of the role
+    path                 = string       # Defaults to 'var.role_path' variable is set to null
+    desc                 = string       # Defaults to 'var.role_desc' variable is set to null
+    trust_policy_file    = string       # Path to file of trust/assume policy
+    permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)
+    policies             = list(string) # List of names of policies (must be defined in var.policies)
+    policy_arns          = list(string) # List of existing policy ARN's
+    inline_policies = list(object({
+      name = string      # Name of the inline policy
+      file = string      # Path to json or json.tmpl file of policy
+      vars = map(string) # Policy template variables {key = val, ...}
+    }))
+  }))
+  default = []
 }
 
 
@@ -172,6 +268,26 @@ variable "policy_path" {
 variable "policy_desc" {
   description = "The default description of the policy."
   default     = "Managed by Terraform"
+}
+
+
+# -------------------------------------------------------------------------------------------------
+# Default Group settings
+# -------------------------------------------------------------------------------------------------
+
+variable "group_path" {
+  description = "The path under which to create the group. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure."
+  default     = "/"
+}
+
+
+# -------------------------------------------------------------------------------------------------
+# Default User settings
+# -------------------------------------------------------------------------------------------------
+
+variable "user_path" {
+  description = "The path under which to create the user. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure."
+  default     = "/"
 }
 
 
@@ -197,16 +313,6 @@ variable "role_max_session_duration" {
 variable "role_force_detach_policies" {
   description = "Specifies to force detaching any policies the role has before destroying it."
   default     = true
-}
-
-
-# -------------------------------------------------------------------------------------------------
-# Default User settings
-# -------------------------------------------------------------------------------------------------
-
-variable "user_path" {
-  description = "The path under which to create the user. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure."
-  default     = "/"
 }
 
 
