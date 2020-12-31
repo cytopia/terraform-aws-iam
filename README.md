@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/cytopia/terraform-aws-iam.svg?branch=master)](https://travis-ci.org/cytopia/terraform-aws-iam)
 [![Tag](https://img.shields.io/github/tag/cytopia/terraform-aws-iam.svg)](https://github.com/cytopia/terraform-aws-iam/releases)
-[![Terraform](https://img.shields.io/badge/Terraform--registry-aws--iam--roles-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/iam/aws/)
+[![Terraform](https://img.shields.io/badge/Terraform--registry-aws--iam-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/iam/aws/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 This Terraform module manages AWS IAM to its full extend.
