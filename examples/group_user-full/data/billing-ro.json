@@ -1,0 +1,20 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "BillingReadOnly",
+      "Effect": "Allow",
+      "Action": [
+        "account:ListRegions",
+        "aws-portal:View*",
+        "awsbillingconsole:View*",
+        "budgets:View*",
+        "ce:Get*",
+        "cur:Describe*",
+        "pricing:Describe*",
+        "pricing:Get*"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
