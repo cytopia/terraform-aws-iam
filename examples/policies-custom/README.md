@@ -49,6 +49,8 @@ No provider.
 
 ## Outputs
 
-No output.
+| Name | Description |
+|------|-------------|
+| policies | Created customer managed IAM policies |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
