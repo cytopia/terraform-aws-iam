@@ -12,9 +12,9 @@ terraform {
 # 1. Account Settings
 # -------------------------------------------------------------------------------------------------
 
-# Create account alias (if not null)
+# Create account alias (if not empty)
 resource "aws_iam_account_alias" "default" {
-  count = var.account_alias != null ? 1 : 0
+  count = var.account_alias != "" ? 1 : 0
 
   account_alias = var.account_alias
 }

@@ -1,13 +1,26 @@
 # Terraform module: AWS IAM
 
-[![Build Status](https://travis-ci.org/cytopia/terraform-aws-iam.svg?branch=master)](https://travis-ci.org/cytopia/terraform-aws-iam)
+**[Features](#star-features)** |
+**[Important](#exclamation-important)** |
+**[Examples](#bulb-examples)** |
+**[Usage](#computer-usage)** |
+**[Inputs](#required-inputs)** |
+**[Outputs](#outputs)** |
+**[Related projects](#related-projects)** |
+**[Authors](#authors)** |
+**[License](#license)**
+
+[![lint](https://github.com/cytopia/terraform-aws-iam/workflows/lint/badge.svg)](https://github.com/cytopia/terraform-aws-iam/actions?query=workflow%3Alint)
+[![test](https://github.com/cytopia/terraform-aws-iam/workflows/test/badge.svg)](https://github.com/cytopia/terraform-aws-iam/actions?query=workflow%3Atest)
 [![Tag](https://img.shields.io/github/tag/cytopia/terraform-aws-iam.svg)](https://github.com/cytopia/terraform-aws-iam/releases)
 [![Terraform](https://img.shields.io/badge/Terraform--registry-aws--iam-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/iam/aws/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
+
 This Terraform module manages AWS IAM to its full extend.
 
-## Features
+
+## :star: Features
 
 * Arbitrary number of IAM **policies**, **groups**, **users** and **roles**
 * Policies can be defined via **JSON** or **templatable JSON** files
@@ -19,39 +32,77 @@ This Terraform module manages AWS IAM to its full extend.
 * **Account settings**: account alias and password policy
 
 
-## Important note
+## :exclamation: Important
 
 When creating an IAM user with an `Inactive` access key, it is initially created with access key set to `Active`. You will have to run it a second time in order to deactivate the access key.
 This is either an issue with the terraform resource `aws_iam_access_key` or with the AWS api itself.
 
-<!--
-## Examples
 
-| Example          | Description |
-|------------------|-------------|
-| **Policies**     |             |
-| [e1]()           | testsdf as fas  |
-| **Groups/Users** |             |
-| [creating groups]()           | testsdf as fas  |
-| [creating users]()           | testsdf as fas  |
-| [users, groups and policies]() | ada sda s|
-| [access key rotation]() | Shows how to safely rotate AWS access keys for IAM users |
-| **Roles**        |             |
-| [e1]()           | testsdf as fas  |
-| **Complex**      |             |
-| [example-1]()    | testsdf as fas  |
-| [example-2]()    | testsdf as fas  |
--->
+## :bulb: Examples
 
-## Usage
+This module is very flexible and might look a bit complicated at first glance. To show off a few features which are possible, have a look at the following examples.
 
-### Assumeable roles
+| Example                                                 | Description                                              |
+|---------------------------------------------------------|----------------------------------------------------------|
+| **POLICIES**                                            |                                                          |
+| [Custom policies](examples/policies-custom/)            | Define custom policies with templating                   |
+| **GROUPS / USERS**                                      |                                                          |
+| [Groups](examples/group_user-groups/)                   | Defines groups                                           |
+| [Users](examples/group_user-users/)                     | Defines users                                            |
+| [Groups, users and policies](examples/group_user-full/) | Defines groups, users and policies                       |
+| [Access key rotation](examples/group_user-key-rotate/)  | Shows how to safely rotate AWS access keys for IAM users |
+| **ROLES**                                               |                                                          |
+| [Roles](examples/roles-basic/)                          | Define roles                                             |
+| [Cross-account-roles](examples/roles-cross_acc/)        | Define cross-account assumable roles                     |
+| **COMPLEX**                                             |                                                          |
+| [Identity Provider Login](examples/complex-provider/)   | Login via SAML and cross-account assume roles            |
+| [Fully managaged IAM](examples/complex-full/)           | All features enabled                                     |
+| [Enrich roles list](examples/complex-enrich_roles)      | Use terraform outputs from your custom created resources (e.g.: ARN's) as inputs in the roles list  |
+
+
+## :computer: Usage
 
 ```hcl
 module "iam_roles" {
   source = "github.com/cytopia/terraform-aws-iam?ref=v5.0.0"
 
+  # --------------------------------------------------------------------------------
+  # Account Management
+  # --------------------------------------------------------------------------------
+
+  account_alias = "prod-account"
+
+  account_pass_policy = {
+    manage                         = true
+    allow_users_to_change_password = true
+    hard_expiry                    = false
+    max_password_age               = 365
+    minimum_password_length        = 8
+    password_reuse_prevention      = 5
+    require_lowercase_characters   = true
+    require_numbers                = true
+    require_symbols                = true
+    require_uppercase_characters   = true
+  }
+
+  # --------------------------------------------------------------------------------
+  # Account Identity provider
+  # --------------------------------------------------------------------------------
+
+  # Add a SAML provider for login
+  providers_saml = [
+    {
+      name = "AzureAD"
+      file = "path/to/meta.xml"
+    }
+  ]
+
+  # --------------------------------------------------------------------------------
+  # Policies, Groups, Users and Roles
+  # --------------------------------------------------------------------------------
+
   # List of policies to create
+  # Policies defined here can be used by name in groups, users and roles list
   policies = [
     {
       name = "ro-billing"
@@ -62,35 +113,31 @@ module "iam_roles" {
     },
   ]
 
+  # List of groups to manage
+  # Groups defined here can be used in users list
+  groups = [
+    {
+      name                 = "admin-group"
+      path                 = null
+      policies             = []
+      policy_arns = [
+        "arn:aws:iam::aws:policy/AdministratorAccess",
+      ]
+      inline_policies      = []
+    },
+  ]
+
   # List of users to manage
   users = [
     {
       name                 = "admin"
       path                 = null
+      groups               = ["admin-group"]
       access_keys          = []
       permissions_boundary = null
       policies             = []
+      policy_arns          = []
       inline_policies      = []
-      policy_arns = [
-        "arn:aws:iam::aws:policy/AdministratorAccess",
-      ]
-    },
-    {
-      name        = "developer"
-      path        = null
-      access_keys = [
-        {
-          name    = "key-1"
-          pgp_key = ""
-          status  = "Active"
-        }
-      ]
-      permissions_boundary = "arn:aws:iam::aws:policy/PowerUserAccess"
-      policies    = [
-        "rds-authenticate",
-      ]
-      inline_policies = []
-      policy_arns     = []
     },
   ]
 
@@ -103,10 +150,10 @@ module "iam_roles" {
       trust_policy_file    = "trust-policies/admin.json"
       permissions_boundary = null
       policies             = []
-      inline_policies      = []
       policy_arns = [
         "arn:aws:iam::aws:policy/AdministratorAccess",
       ]
+      inline_policies      = []
     },
     {
       name                 = "ROLE-DEV"
@@ -117,158 +164,361 @@ module "iam_roles" {
       policies = [
         "ro-billing",
       ]
-      inline_policies = []
       policy_arns = [
         "arn:aws:iam::aws:policy/PowerUserAccess",
       ]
+      inline_policies      = []
     },
   ]
 
+  # --------------------------------------------------------------------------------
+  # Defaults
+  # --------------------------------------------------------------------------------
+
+  policy_path = "/"
+  policy_desc = "Managed by Terraform"
+  group_path  = "/"
+  user_path   = "/"
+  role_path   = "/"
+  role_desc   = "Managed by Terraform"
+
+  role_max_session_duration  = 3600
+  role_force_detach_policies = true
+
+  tags = {
+    env   = "prod"
+    owner = "terraform"
+  }
 }
 ```
 
-**`trust-policies/admin.json`**
 
-Defines the permissions (Authorization)
+<!-- TFDOCS_INPUTS_START -->
+## Required Inputs
+
+No required input.
+
+## Optional Inputs
+
+The following input variables are optional (have default values):
+
+### account\_alias
+
+Description: Assign the account alias for the AWS Account. Unmanaged by default. Resource will be created if the string is non-empty.
+
+Type: `string`
+
+Default: `""`
+
+### account\_pass\_policy
+
+Description: Manages Password Policy for the AWS Account. Unmanaged by default. Resource will be created if 'manage' is set to true.
+
+Type:
+
+```hcl
+object({
+    manage                         = bool   # Set to true, to manage the AWS account password policy
+    allow_users_to_change_password = bool   # Allow users to change their own password?
+    hard_expiry                    = bool   # Users are prevented from setting a new password after their password has expired?
+    max_password_age               = number # Number of days that an user password is valid
+    minimum_password_length        = number # Minimum length to require for user passwords
+    password_reuse_prevention      = number # The number of previous passwords that users are prevented from reusing
+    require_lowercase_characters   = bool   # Require lowercase characters for user passwords?
+    require_numbers                = bool   # Require numbers for user passwords?
+    require_symbols                = bool   # Require symbols for user passwords?
+    require_uppercase_characters   = bool   # Require uppercase characters for user passwords?
+  })
+```
+
+Default:
+
 ```json
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "AWS": [
-          "arn:aws:iam::1234567:role/federation/LOGIN-ADMIN"
-        ]
-      },
-      "Condition": {}
-    }
-  ]
-}
-```
-**`trust-policies/dev.json`**
-
-Defines the permissions (Authorization)
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "AWS": [
-          "arn:aws:iam::1234567:role/federation/LOGIN-DEV",
-          "arn:aws:iam::1234567:role/federation/LOGIN-ADMIN"
-        ]
-      },
-      "Condition": {}
-    }
-  ]
+  "allow_users_to_change_password": null,
+  "hard_expiry": null,
+  "manage": false,
+  "max_password_age": null,
+  "minimum_password_length": null,
+  "password_reuse_prevention": null,
+  "require_lowercase_characters": null,
+  "require_numbers": null,
+  "require_symbols": null,
+  "require_uppercase_characters": null
 }
 ```
 
+### providers\_saml
 
-**`policies/ro-billing.json`**
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "BillingReadOnly",
-      "Effect": "Allow",
-      "Action": [
-        "account:ListRegions",
-        "aws-portal:View*",
-        "awsbillingconsole:View*",
-        "budgets:View*",
-        "ce:Get*",
-        "cur:Describe*",
-        "pricing:Describe*",
-        "pricing:Get*"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
+Description: A list of dictionaries defining saml providers.
+
+Type:
+
+```hcl
+list(object({
+    name = string # The name of the provider to create
+    file = string # Path to XML generated by identity provider that supports SAML 2.0
+  }))
 ```
 
+Default: `[]`
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
-## Requirements
+### providers\_oidc
 
-| Name | Version |
-|------|---------|
-| terraform | >= 0.12.6 |
+Description: A list of dictionaries defining openid connect providers.
 
-## Providers
+Type:
 
-| Name | Version |
-|------|---------|
-| aws | n/a |
+```hcl
+list(object({
+    url             = string       # URL of the identity provider. Corresponds to the iss claim
+    client_id_list  = list(string) # List of client IDs (also known as audiences)
+    thumbprint_list = list(string) # List of server certificate thumbprints.
+  }))
+```
 
-## Inputs
+Default: `[]`
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| account\_alias | Assign the account alias for the AWS Account or leave null to not manage it. | `string` | `null` | no |
-| account\_pass\_policy | Manages Password Policy for the AWS Account. | <pre>object({<br>    manage                         = bool  # Set to true, to manage the pass policy<br>    allow_users_to_change_password = bool<br>    hard_expiry                    = bool<br>    max_password_age               = number<br>    minimum_password_length        = number<br>    password_reuse_prevention      = number<br>    require_lowercase_characters   = bool<br>    require_numbers                = bool<br>    require_symbols                = bool<br>    require_uppercase_characters   = bool<br>  })</pre> | <pre>{<br>  "allow_users_to_change_password": null,<br>  "hard_expiry": null,<br>  "manage": false,<br>  "max_password_age": null,<br>  "minimum_password_length": null,<br>  "password_reuse_prevention": null,<br>  "require_lowercase_characters": null,<br>  "require_numbers": null,<br>  "require_symbols": null,<br>  "require_uppercase_characters": null<br>}</pre> | no |
-| providers\_saml | A list of dictionaries defining saml providers. | <pre>list(object({<br>    name = string<br>    file = string<br>  }))</pre> | `[]` | no |
-| providers\_oidc | A list of dictionaries defining openid connect providers. | <pre>list(object({<br>    url             = string<br>    client_id_list  = list(string)<br>    thumbprint_list = list(string)<br>  }))</pre> | `[]` | no |
-| policies | A list of dictionaries defining all policies. | <pre>list(object({<br>    name = string      # Name of the policy<br>    path = string      # Defaults to 'var.policy_path' variable is set to null<br>    desc = string      # Defaults to 'var.policy_desc' variable is set to null<br>    file = string      # Path to json or json.tmpl file of policy<br>    vars = map(string) # Policy template variables {key: val, ...}<br>  }))</pre> | `[]` | no |
-| groups | A list of dictionaries defining all groups. | <pre>list(object({<br>    name        = string       # Name of the group<br>    path        = string       # Defaults to 'var.group_path' if variable is set to null<br>    policies    = list(string) # List of names of policies (must be defined in var.policies)<br>    policy_arns = list(string) # List of existing policy ARN's<br>    inline_policies = list(object({<br>      name = string      # Name of the inline policy<br>      file = string      # Path to json or json.tmpl file of policy<br>      vars = map(string) # Policy template variables {key = val, ...}<br>    }))<br>  }))</pre> | `[]` | no |
-| users | A list of dictionaries defining all users. | <pre>list(object({<br>    name   = string       # Name of the user<br>    path   = string       # Defaults to 'var.user_path' variable is set to null<br>    groups = list(string) # List of group names to add this user to<br>    access_keys = list(object({<br>      name    = string # IaC identifier for first or second IAM access key (not used on AWS)<br>      pgp_key = string # Leave empty for non or provide a b64-enc pubkey or keybase username<br>      status  = string # 'Active' or 'Inactive'<br>    }))<br>    permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)<br>    policies             = list(string) # List of names of policies (must be defined in var.policies)<br>    policy_arns          = list(string) # List of existing policy ARN's<br>    inline_policies = list(object({<br>      name = string      # Name of the inline policy<br>      file = string      # Path to json or json.tmpl file of policy<br>      vars = map(string) # Policy template variables {key = val, ...}<br>    }))<br>  }))</pre> | `[]` | no |
-| roles | A list of dictionaries defining all roles. | <pre>list(object({<br>    name                 = string       # Name of the role<br>    path                 = string       # Defaults to 'var.role_path' variable is set to null<br>    desc                 = string       # Defaults to 'var.role_desc' variable is set to null<br>    trust_policy_file    = string       # Path to file of trust/assume policy<br>    permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)<br>    policies             = list(string) # List of names of policies (must be defined in var.policies)<br>    policy_arns          = list(string) # List of existing policy ARN's<br>    inline_policies = list(object({<br>      name = string      # Name of the inline policy<br>      file = string      # Path to json or json.tmpl file of policy<br>      vars = map(string) # Policy template variables {key = val, ...}<br>    }))<br>  }))</pre> | `[]` | no |
-| policy\_path | The default path under which to create the policy if not specified in the policies list. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure. | `string` | `"/"` | no |
-| policy\_desc | The default description of the policy. | `string` | `"Managed by Terraform"` | no |
-| group\_path | The path under which to create the group. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure. | `string` | `"/"` | no |
-| user\_path | The path under which to create the user. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure. | `string` | `"/"` | no |
-| role\_path | The path under which to create the role. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure. | `string` | `"/"` | no |
-| role\_desc | The description of the role. | `string` | `"Managed by Terraform"` | no |
-| role\_max\_session\_duration | The maximum session duration (in seconds) that you want to set for the specified role. This setting can have a value from 1 hour to 12 hours specified in seconds. | `string` | `"3600"` | no |
-| role\_force\_detach\_policies | Specifies to force detaching any policies the role has before destroying it. | `bool` | `true` | no |
-| tags | Key-value mapping of tags for the IAM role or user. | `map(any)` | `{}` | no |
+### policies
 
+Description: A list of dictionaries defining all policies.
+
+Type:
+
+```hcl
+list(object({
+    name = string      # Name of the policy
+    path = string      # Defaults to 'var.policy_path' variable is set to null
+    desc = string      # Defaults to 'var.policy_desc' variable is set to null
+    file = string      # Path to json or json.tmpl file of policy
+    vars = map(string) # Policy template variables {key: val, ...}
+  }))
+```
+
+Default: `[]`
+
+### groups
+
+Description: A list of dictionaries defining all groups.
+
+Type:
+
+```hcl
+list(object({
+    name        = string       # Name of the group
+    path        = string       # Defaults to 'var.group_path' if variable is set to null
+    policies    = list(string) # List of names of policies (must be defined in var.policies)
+    policy_arns = list(string) # List of existing policy ARN's
+    inline_policies = list(object({
+      name = string      # Name of the inline policy
+      file = string      # Path to json or json.tmpl file of policy
+      vars = map(string) # Policy template variables {key = val, ...}
+    }))
+  }))
+```
+
+Default: `[]`
+
+### users
+
+Description: A list of dictionaries defining all users.
+
+Type:
+
+```hcl
+list(object({
+    name   = string       # Name of the user
+    path   = string       # Defaults to 'var.user_path' variable is set to null
+    groups = list(string) # List of group names to add this user to
+    access_keys = list(object({
+      name    = string # IaC identifier for first or second IAM access key (not used on AWS)
+      pgp_key = string # Leave empty for non or provide a b64-enc pubkey or keybase username
+      status  = string # 'Active' or 'Inactive'
+    }))
+    permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)
+    policies             = list(string) # List of names of policies (must be defined in var.policies)
+    policy_arns          = list(string) # List of existing policy ARN's
+    inline_policies = list(object({
+      name = string      # Name of the inline policy
+      file = string      # Path to json or json.tmpl file of policy
+      vars = map(string) # Policy template variables {key = val, ...}
+    }))
+  }))
+```
+
+Default: `[]`
+
+### roles
+
+Description: A list of dictionaries defining all roles.
+
+Type:
+
+```hcl
+list(object({
+    name                 = string       # Name of the role
+    path                 = string       # Defaults to 'var.role_path' variable is set to null
+    desc                 = string       # Defaults to 'var.role_desc' variable is set to null
+    trust_policy_file    = string       # Path to file of trust/assume policy
+    permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)
+    policies             = list(string) # List of names of policies (must be defined in var.policies)
+    policy_arns          = list(string) # List of existing policy ARN's
+    inline_policies = list(object({
+      name = string      # Name of the inline policy
+      file = string      # Path to json or json.tmpl file of policy
+      vars = map(string) # Policy template variables {key = val, ...}
+    }))
+  }))
+```
+
+Default: `[]`
+
+### policy\_path
+
+Description: The default path under which to create the policy if not specified in the policies list. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure.
+
+Type: `string`
+
+Default: `"/"`
+
+### policy\_desc
+
+Description: The default description of the policy.
+
+Type: `string`
+
+Default: `"Managed by Terraform"`
+
+### group\_path
+
+Description: The path under which to create the group. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure.
+
+Type: `string`
+
+Default: `"/"`
+
+### user\_path
+
+Description: The path under which to create the user. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure.
+
+Type: `string`
+
+Default: `"/"`
+
+### role\_path
+
+Description: The path under which to create the role. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure.
+
+Type: `string`
+
+Default: `"/"`
+
+### role\_desc
+
+Description: The description of the role.
+
+Type: `string`
+
+Default: `"Managed by Terraform"`
+
+### role\_max\_session\_duration
+
+Description: The maximum session duration (in seconds) that you want to set for the specified role. This setting can have a value from 1 hour to 12 hours specified in seconds.
+
+Type: `string`
+
+Default: `"3600"`
+
+### role\_force\_detach\_policies
+
+Description: Specifies to force detaching any policies the role has before destroying it.
+
+Type: `bool`
+
+Default: `true`
+
+### tags
+
+Description: Key-value mapping of tags for the IAM role or user.
+
+Type: `map(any)`
+
+Default: `{}`
+
+<!-- TFDOCS_INPUTS_END -->
+
+
+<!-- TFDOCS_OUTPUTS_START -->
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| debug\_var\_policies | The transformed policy map |
-| debug\_var\_groups | The defined groups list |
-| debug\_var\_users | The defined users list |
-| debug\_var\_roles | The defined roles list |
 | account\_alias | Created Account alias. |
 | account\_pass\_policy | Created Account password policy. |
-| providers\_saml | Created SAML providers. |
-| providers\_oidc | Created OpenID Connect providers. |
-| debug\_local\_policies | The transformed policy map |
-| debug\_local\_group\_policies | The transformed group policy map |
 | debug\_local\_group\_inline\_policies | The transformed group inline policy map |
+| debug\_local\_group\_policies | The transformed group policy map |
 | debug\_local\_group\_policy\_arns | The transformed group policy arns map |
-| policies | Created customer managed IAM policies |
-| groups | Created IAM groups |
-| group\_policy\_attachments | Attached group customer managed IAM policies |
-| group\_inline\_policy\_attachments | Attached group inline IAM policies |
-| group\_policy\_arn\_attachments | Attached group IAM policy arns |
-| debug\_local\_user\_policies | The transformed user policy map |
-| debug\_local\_user\_access\_keys | The transformed user access key map |
-| debug\_local\_user\_inline\_policies | The transformed user inline policy map |
-| debug\_local\_user\_policy\_arns | The transformed user policy arns map |
+| debug\_local\_policies | The transformed policy map |
+| debug\_local\_role\_inline\_policies | The transformed role inline policy map |
 | debug\_local\_role\_policies | The transformed role policy map |
 | debug\_local\_role\_policy\_arns | The transformed role policy arns map |
-| users | Created IAM users |
-| user\_policy\_attachments | Attached user customer managed IAM policies |
-| user\_inline\_policy\_attachments | Attached user inline IAM policies |
-| user\_policy\_arn\_attachments | Attached user IAM policy arns |
-| user\_group\_memberships | Assigned user/group memberships |
-| debug\_local\_role\_inline\_policies | The transformed role inline policy map |
-| roles | Created IAM roles |
-| role\_policy\_attachments | Attached role customer managed IAM policies |
+| debug\_local\_user\_access\_keys | The transformed user access key map |
+| debug\_local\_user\_inline\_policies | The transformed user inline policy map |
+| debug\_local\_user\_policies | The transformed user policy map |
+| debug\_local\_user\_policy\_arns | The transformed user policy arns map |
+| debug\_var\_groups | The defined groups list |
+| debug\_var\_policies | The transformed policy map |
+| debug\_var\_roles | The defined roles list |
+| debug\_var\_users | The defined users list |
+| group\_inline\_policy\_attachments | Attached group inline IAM policies |
+| group\_policy\_arn\_attachments | Attached group IAM policy arns |
+| group\_policy\_attachments | Attached group customer managed IAM policies |
+| groups | Created IAM groups |
+| policies | Created customer managed IAM policies |
+| providers\_oidc | Created OpenID Connect providers. |
+| providers\_saml | Created SAML providers. |
 | role\_inline\_policy\_attachments | Attached role inline IAM policies |
 | role\_policy\_arn\_attachments | Attached role IAM policy arns |
+| role\_policy\_attachments | Attached role customer managed IAM policies |
+| roles | Created IAM roles |
+| user\_group\_memberships | Assigned user/group memberships |
+| user\_inline\_policy\_attachments | Attached user inline IAM policies |
+| user\_policy\_arn\_attachments | Attached user IAM policy arns |
+| user\_policy\_attachments | Attached user customer managed IAM policies |
+| users | Created IAM users |
 
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- TFDOCS_OUTPUTS_END -->
+
+
+## Related projects
+
+| GitHub | Module Registry | Description |
+|--------|-----------------|-------------|
+| [aws-iam][aws_iam_git_lnk]                         | [aws-iam][aws_iam_reg_lnk]                         | Manages AWS IAM to its full extend  |
+| [aws-iam-roles][aws_iam_roles_git_lnk]             | [aws-iam-roles][aws_iam_roles_reg_lnk]             | Deprecated by [aws-iam][aws_iam_git_lnk] |
+| [aws-iam-cross_account][aws_iam_cross_acc_git_lnk] | [aws-iam-cross-account][aws_iam_cross_acc_reg_lnk] | Deprecated by [aws-iam][aws_iam_git_lnk] |
+| [aws-route53][aws_route53_git_lnk]                 | [aws-route53][aws_route53_reg_lnk]                 | Manages creation of multiple Route53 zones including attachment to new or existing delegation set |
+| [aws-elb][aws_elb_git_lnk]                         | [aws-elb][aws_elb_reg_lnk]                         | Manages ELB with optionally a public and/or private Route53 DNS record attached to it |
+| [aws-rds][aws_rds_git_lnk]                         | [aws-rds][aws_rds_reg_lnk]                         | Manages RDS resources on AWS |
+
+[aws_iam_git_lnk]: https://github.com/cytopia/terraform-aws-iam
+[aws_iam_reg_lnk]: https://registry.terraform.io/modules/cytopia/iam/aws
+
+[aws_iam_roles_git_lnk]: https://github.com/cytopia/terraform-aws-iam-roles
+[aws_iam_roles_reg_lnk]: https://registry.terraform.io/modules/cytopia/iam-roles/aws
+
+[aws_iam_cross_acc_git_lnk]: https://github.com/cytopia/terraform-aws-iam-cross-account
+[aws_iam_cross_acc_reg_lnk]: https://registry.terraform.io/modules/cytopia/iam-cross-account/aws
+
+[aws_route53_git_lnk]: https://github.com/cytopia/terraform-aws-route53-zone
+[aws_route53_reg_lnk]: https://registry.terraform.io/modules/cytopia/route53-zone/aws
+
+[aws_elb_git_lnk]: https://github.com/cytopia/terraform-aws-elb
+[aws_elb_reg_lnk]: https://registry.terraform.io/modules/cytopia/elb/aws
+
+[aws_rds_git_lnk]: https://github.com/cytopia/terraform-aws-rds
+[aws_rds_reg_lnk]: https://registry.terraform.io/modules/cytopia/rds/aws
+
 
 ## Authors
 
@@ -277,6 +527,6 @@ Module managed by [cytopia](https://github.com/cytopia).
 
 ## License
 
-[MIT License](LICENSE)
+**[MIT License](LICENSE)**
 
-Copyright (c) 2018 [cytopia](https://github.com/cytopia)
+Copyright (c) 2018 **[cytopia](https://github.com/cytopia)**
