@@ -10,7 +10,8 @@
 **[Authors](#authors)** |
 **[License](#license)**
 
-[![Build Status](https://travis-ci.org/cytopia/terraform-aws-iam.svg?branch=master)](https://travis-ci.org/cytopia/terraform-aws-iam)
+[![lint](https://github.com/cytopia/terraform-aws-iam/workflows/lint/badge.svg)](https://github.com/cytopia/terraform-aws-iam/actions?query=workflow%3Alint)
+[![test](https://github.com/cytopia/terraform-aws-iam/workflows/test/badge.svg)](https://github.com/cytopia/terraform-aws-iam/actions?query=workflow%3Atest)
 [![Tag](https://img.shields.io/github/tag/cytopia/terraform-aws-iam.svg)](https://github.com/cytopia/terraform-aws-iam/releases)
 [![Terraform](https://img.shields.io/badge/Terraform--registry-aws--iam-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/iam/aws/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -24,7 +25,7 @@
 > [aws-rds][aws_rds_git_lnk]
 
 
-This Terraform module manages AWS IAM to its full extend.
+**This Terraform module manages AWS IAM to its full extend.**
 
 ## :star: Features
 
