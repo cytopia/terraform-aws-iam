@@ -56,8 +56,7 @@ This module is very flexible and might look a bit complicated at first glance. T
 | [Groups, users and policies](examples/group_user--full/) | Defines groups, users and policies                       |
 | [Access key rotation](examples/group_user--key_rotate/)  | Shows how to safely rotate AWS access keys for IAM users |
 | **ROLES**                                                |                                                          |
-| [Roles](examples/roles-basic/)                           | Define roles                                             |
-| [Cross-account-roles](examples/roles--cross_account/)    | Define cross-account assumable roles                     |
+| [Roles](examples/roles--basic/)                          | Define roles (cross-account assumable)                   |
 | **COMPLEX**                                              |                                                          |
 | [Identity Provider Login](examples/complex--provider/)   | Login into AWS via SAML and assume cross-account roles   |
 | [Fully managaged IAM](examples/complex--full/)           | All features enabled                                     |
