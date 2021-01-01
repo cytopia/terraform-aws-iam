@@ -121,10 +121,21 @@ _gen-main:
 	@echo "------------------------------------------------------------"
 	@if docker run --rm \
 		-v $(CURRENT_DIR):/data \
-		-e DELIM_START='$(DELIM_START)' \
-		-e DELIM_CLOSE='$(DELIM_CLOSE)' \
+		-e DELIM_START='<!-- TFDOCS_INPUTS_START -->' \
+		-e DELIM_CLOSE='<!-- TFDOCS_INPUTS_END -->' \
 		cytopia/terraform-docs:$(TFDOCS_VERSION) \
-		terraform-docs-replace-012 $(TFDOCS_ARGS) md README.md; then \
+		terraform-docs-replace-012 --show-all=false --show inputs md doc --indent 3 $(TFDOCS_ARGS) README.md; then \
+		echo "OK"; \
+	else \
+		echo "Failed"; \
+		exit 1; \
+	fi
+	@if docker run --rm \
+		-v $(CURRENT_DIR):/data \
+		-e DELIM_START='<!-- TFDOCS_OUTPUTS_START -->' \
+		-e DELIM_CLOSE='<!-- TFDOCS_OUTPUTS_END -->' \
+		cytopia/terraform-docs:$(TFDOCS_VERSION) \
+		terraform-docs-replace-012 --show-all=false --show outputs md tbl --indent 2 --sort README.md; then \
 		echo "OK"; \
 	else \
 		echo "Failed"; \
