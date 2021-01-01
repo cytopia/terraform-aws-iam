@@ -77,7 +77,7 @@ test: _pull-tf
 		echo "------------------------------------------------------------"; \
 		echo "# Terraform init"; \
 		echo "------------------------------------------------------------"; \
-		if docker run -it --rm -v "$(CURRENT_DIR):/t" --workdir "$${DOCKER_PATH}" hashicorp/terraform:$(TF_VERSION) \
+		if docker run $$(tty -s && echo "-it" || echo) --rm -v "$(CURRENT_DIR):/t" --workdir "$${DOCKER_PATH}" hashicorp/terraform:$(TF_VERSION) \
 			init \
 				-verify-plugins=true \
 				-lock=false \
@@ -90,22 +90,22 @@ test: _pull-tf
 			echo "OK"; \
 		else \
 			echo "Failed"; \
-			docker run -it --rm -v "$(CURRENT_DIR):/t" --workdir "$${DOCKER_PATH}" --entrypoint=rm hashicorp/terraform:$(TF_VERSION) -rf .terraform/ || true; \
+			docker run $$(tty -s && echo "-it" || echo) --rm -v "$(CURRENT_DIR):/t" --workdir "$${DOCKER_PATH}" --entrypoint=rm hashicorp/terraform:$(TF_VERSION) -rf .terraform/ || true; \
 			exit 1; \
 		fi; \
 		echo; \
 		echo "------------------------------------------------------------"; \
 		echo "# Terraform validate"; \
 		echo "------------------------------------------------------------"; \
-		if docker run -it --rm -v "$(CURRENT_DIR):/t" --workdir "$${DOCKER_PATH}" hashicorp/terraform:$(TF_VERSION) \
+		if docker run $$(tty -s && echo "-it" || echo) --rm -v "$(CURRENT_DIR):/t" --workdir "$${DOCKER_PATH}" hashicorp/terraform:$(TF_VERSION) \
 			validate \
 				$(ARGS) \
 				.; then \
 			echo "OK"; \
-			docker run -it --rm -v "$(CURRENT_DIR):/t" --workdir "$${DOCKER_PATH}" --entrypoint=rm hashicorp/terraform:$(TF_VERSION) -rf .terraform/ || true; \
+			docker run $$(tty -s && echo "-it" || echo) --rm -v "$(CURRENT_DIR):/t" --workdir "$${DOCKER_PATH}" --entrypoint=rm hashicorp/terraform:$(TF_VERSION) -rf .terraform/ || true; \
 		else \
 			echo "Failed"; \
-			docker run -it --rm -v "$(CURRENT_DIR):/t" --workdir "$${DOCKER_PATH}" --entrypoint=rm hashicorp/terraform:$(TF_VERSION) -rf .terraform/ || true; \
+			docker run $$(tty -s && echo "-it" || echo) --rm -v "$(CURRENT_DIR):/t" --workdir "$${DOCKER_PATH}" --entrypoint=rm hashicorp/terraform:$(TF_VERSION) -rf .terraform/ || true; \
 			exit 1; \
 		fi; \
 		echo; \
@@ -119,7 +119,7 @@ _gen-main:
 	@echo "------------------------------------------------------------"
 	@echo "# Main module"
 	@echo "------------------------------------------------------------"
-	@if docker run --rm \
+	@if docker run $$(tty -s && echo "-it" || echo) --rm \
 		-v $(CURRENT_DIR):/data \
 		-e DELIM_START='<!-- TFDOCS_INPUTS_START -->' \
 		-e DELIM_CLOSE='<!-- TFDOCS_INPUTS_END -->' \
@@ -130,7 +130,7 @@ _gen-main:
 		echo "Failed"; \
 		exit 1; \
 	fi
-	@if docker run --rm \
+	@if docker run $$(tty -s && echo "-it" || echo) --rm \
 		-v $(CURRENT_DIR):/data \
 		-e DELIM_START='<!-- TFDOCS_OUTPUTS_START -->' \
 		-e DELIM_CLOSE='<!-- TFDOCS_OUTPUTS_END -->' \
@@ -149,7 +149,7 @@ _gen-examples:
 		echo "------------------------------------------------------------"; \
 		echo "# $${DOCKER_PATH}"; \
 		echo "------------------------------------------------------------"; \
-		if docker run --rm \
+		if docker run $$(tty -s && echo "-it" || echo) --rm \
 			-v $(CURRENT_DIR):/data \
 			-e DELIM_START='$(DELIM_START)' \
 			-e DELIM_CLOSE='$(DELIM_CLOSE)' \
@@ -169,7 +169,7 @@ _gen-modules:
 		echo "------------------------------------------------------------"; \
 		echo "# $${DOCKER_PATH}"; \
 		echo "------------------------------------------------------------"; \
-		if docker run --rm \
+		if docker run $$(tty -s && echo "-it" || echo) --rm \
 			-v $(CURRENT_DIR):/data \
 			-e DELIM_START='$(DELIM_START)' \
 			-e DELIM_CLOSE='$(DELIM_CLOSE)' \
@@ -187,12 +187,12 @@ _lint-files: _pull-fl
 	@echo "################################################################################"
 	@echo "# File-lint"
 	@echo "################################################################################"
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-cr --text --ignore '.git/,.github/,.terraform/' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-crlf --text --ignore '.git/,.github/,.terraform/' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-trailing-single-newline --text --ignore '.git/,.github/,.terraform/' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-trailing-space --text --ignore '.git/,.github/,.terraform/' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8 --text --ignore '.git/,.github/,.terraform/' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8-bom --text --ignore '.git/,.github/,.terraform/' --path .
+	@docker run $$(tty -s && echo "-it" || echo) --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-cr --text --ignore '.git/,.github/,.terraform/' --path .
+	@docker run $$(tty -s && echo "-it" || echo) --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-crlf --text --ignore '.git/,.github/,.terraform/' --path .
+	@docker run $$(tty -s && echo "-it" || echo) --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-trailing-single-newline --text --ignore '.git/,.github/,.terraform/' --path .
+	@docker run $$(tty -s && echo "-it" || echo) --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-trailing-space --text --ignore '.git/,.github/,.terraform/' --path .
+	@docker run $$(tty -s && echo "-it" || echo) --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8 --text --ignore '.git/,.github/,.terraform/' --path .
+	@docker run $$(tty -s && echo "-it" || echo) --rm -v $(CURRENT_DIR):/data cytopia/file-lint:$(FL_VERSION) file-utf8-bom --text --ignore '.git/,.github/,.terraform/' --path .
 
 _lint-fmt: _pull-tf
 	@# Lint all Terraform files
@@ -203,7 +203,7 @@ _lint-fmt: _pull-tf
 	@echo "------------------------------------------------------------"
 	@echo "# *.tf files"
 	@echo "------------------------------------------------------------"
-	@if docker run -it --rm -v "$(CURRENT_DIR):/t:ro" --workdir "/t" hashicorp/terraform:$(TF_VERSION) \
+	@if docker run $$(tty -s && echo "-it" || echo) --rm -v "$(CURRENT_DIR):/t:ro" --workdir "/t" hashicorp/terraform:$(TF_VERSION) \
 		fmt -check=true -diff=true -write=false -list=true .; then \
 		echo "OK"; \
 	else \
@@ -214,7 +214,7 @@ _lint-fmt: _pull-tf
 	@echo "------------------------------------------------------------"
 	@echo "# *.tfvars files"
 	@echo "------------------------------------------------------------"
-	@if docker run --rm --entrypoint=/bin/sh -v "$(CURRENT_DIR):/t:ro" --workdir "/t" hashicorp/terraform:$(TF_VERSION) \
+	@if docker run $$(tty -s && echo "-it" || echo) --rm --entrypoint=/bin/sh -v "$(CURRENT_DIR):/t:ro" --workdir "/t" hashicorp/terraform:$(TF_VERSION) \
 		-c "find . -name '*.tfvars' -type f -print0 | xargs -0 -n1 terraform fmt -check=true -write=false -diff=true -list=true"; then \
 		echo "OK"; \
 	else \
@@ -228,7 +228,7 @@ _lint-json: _pull-jl
 	@echo "################################################################################"
 	@echo "# Jsonlint"
 	@echo "################################################################################"
-	@if docker run --rm -v "$(CURRENT_DIR):/data:ro" cytopia/jsonlint:$(JL_VERSION) \
+	@if docker run $$(tty -s && echo "-it" || echo) --rm -v "$(CURRENT_DIR):/data:ro" cytopia/jsonlint:$(JL_VERSION) \
 		-t '  ' -i '*.terraform/*' '*.json'; then \
 		echo "OK"; \
 	else \

@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: False
       matrix:
-        targets:
+        target:
           - lint
           - gen
 
