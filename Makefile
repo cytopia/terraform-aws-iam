@@ -124,7 +124,7 @@ _gen-main:
 		-e DELIM_START='<!-- TFDOCS_INPUTS_START -->' \
 		-e DELIM_CLOSE='<!-- TFDOCS_INPUTS_END -->' \
 		cytopia/terraform-docs:$(TFDOCS_VERSION) \
-		terraform-docs-replace-012 --show-all=false --show inputs md doc --indent 3 $(TFDOCS_ARGS) README.md; then \
+		terraform-docs-replace-012 --show-all=false --show inputs md doc --indent 2 $(TFDOCS_ARGS) README.md; then \
 		echo "OK"; \
 	else \
 		echo "Failed"; \

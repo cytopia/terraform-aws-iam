@@ -4,7 +4,7 @@
 **[Important](#exclamation-important)** |
 **[Examples](#bulb-examples)** |
 **[Usage](#computer-usage)** |
-**[Inputs](#inputs)** |
+**[Inputs](#required-inputs)** |
 **[Outputs](#outputs)** |
 **[Related projects](#related-projects)** |
 **[Authors](#authors)** |
@@ -16,16 +16,9 @@
 [![Terraform](https://img.shields.io/badge/Terraform--registry-aws--iam-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/iam/aws/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-> **Other Terraform modules**</br>
-> [aws-iam][aws_iam_git_lnk] •
-> [aws-iam-roles][aws_iam_roles_git_lnk] •
-> [aws-iam-cross_account][aws_iam_cross_acc_git_lnk] •
-> [aws-route53][aws_route53_git_lnk] •
-> [aws-elb][aws_elb_git_lnk] •
-> [aws-rds][aws_rds_git_lnk]
 
+This Terraform module manages AWS IAM to its full extend.
 
-**This Terraform module manages AWS IAM to its full extend.**
 
 ## :star: Features
 
@@ -41,15 +34,13 @@
 
 ## :exclamation: Important
 
-### AWS Access Keys
-
 When creating an IAM user with an `Inactive` access key, it is initially created with access key set to `Active`. You will have to run it a second time in order to deactivate the access key.
 This is either an issue with the terraform resource `aws_iam_access_key` or with the AWS api itself.
 
 
 ## :bulb: Examples
 
-This module is very flexible and might look complicated at first glance. To show off a few features that a possible with it, have a look at the following examples.
+This module is very flexible and might look a bit complicated at first glance. To show off a few features which are possible, have a look at the following examples.
 
 | Example                                                 | Description                                              |
 |---------------------------------------------------------|----------------------------------------------------------|
@@ -202,18 +193,16 @@ module "iam_roles" {
 ```
 
 
-## Inputs
-
 <!-- TFDOCS_INPUTS_START -->
-### Required Inputs
+## Required Inputs
 
 No required input.
 
-### Optional Inputs
+## Optional Inputs
 
 The following input variables are optional (have default values):
 
-#### account\_alias
+### account\_alias
 
 Description: Assign the account alias for the AWS Account. Unmanaged by default. Resource will be created if the string is non-empty.
 
@@ -221,7 +210,7 @@ Type: `string`
 
 Default: `""`
 
-#### account\_pass\_policy
+### account\_pass\_policy
 
 Description: Manages Password Policy for the AWS Account. Unmanaged by default. Resource will be created if 'manage' is set to true.
 
@@ -259,7 +248,7 @@ Default:
 }
 ```
 
-#### providers\_saml
+### providers\_saml
 
 Description: A list of dictionaries defining saml providers.
 
@@ -274,7 +263,7 @@ list(object({
 
 Default: `[]`
 
-#### providers\_oidc
+### providers\_oidc
 
 Description: A list of dictionaries defining openid connect providers.
 
@@ -290,7 +279,7 @@ list(object({
 
 Default: `[]`
 
-#### policies
+### policies
 
 Description: A list of dictionaries defining all policies.
 
@@ -308,7 +297,7 @@ list(object({
 
 Default: `[]`
 
-#### groups
+### groups
 
 Description: A list of dictionaries defining all groups.
 
@@ -330,7 +319,7 @@ list(object({
 
 Default: `[]`
 
-#### users
+### users
 
 Description: A list of dictionaries defining all users.
 
@@ -359,7 +348,7 @@ list(object({
 
 Default: `[]`
 
-#### roles
+### roles
 
 Description: A list of dictionaries defining all roles.
 
@@ -384,7 +373,7 @@ list(object({
 
 Default: `[]`
 
-#### policy\_path
+### policy\_path
 
 Description: The default path under which to create the policy if not specified in the policies list. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure.
 
@@ -392,7 +381,7 @@ Type: `string`
 
 Default: `"/"`
 
-#### policy\_desc
+### policy\_desc
 
 Description: The default description of the policy.
 
@@ -400,7 +389,7 @@ Type: `string`
 
 Default: `"Managed by Terraform"`
 
-#### group\_path
+### group\_path
 
 Description: The path under which to create the group. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure.
 
@@ -408,7 +397,7 @@ Type: `string`
 
 Default: `"/"`
 
-#### user\_path
+### user\_path
 
 Description: The path under which to create the user. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure.
 
@@ -416,7 +405,7 @@ Type: `string`
 
 Default: `"/"`
 
-#### role\_path
+### role\_path
 
 Description: The path under which to create the role. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure.
 
@@ -424,7 +413,7 @@ Type: `string`
 
 Default: `"/"`
 
-#### role\_desc
+### role\_desc
 
 Description: The description of the role.
 
@@ -432,7 +421,7 @@ Type: `string`
 
 Default: `"Managed by Terraform"`
 
-#### role\_max\_session\_duration
+### role\_max\_session\_duration
 
 Description: The maximum session duration (in seconds) that you want to set for the specified role. This setting can have a value from 1 hour to 12 hours specified in seconds.
 
@@ -440,7 +429,7 @@ Type: `string`
 
 Default: `"3600"`
 
-#### role\_force\_detach\_policies
+### role\_force\_detach\_policies
 
 Description: Specifies to force detaching any policies the role has before destroying it.
 
@@ -448,7 +437,7 @@ Type: `bool`
 
 Default: `true`
 
-#### tags
+### tags
 
 Description: Key-value mapping of tags for the IAM role or user.
 
