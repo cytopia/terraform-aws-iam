@@ -12,7 +12,5 @@ module "aws_iam" {
   source = "../.."
 
   policies = var.policies
-
-  groups = var.groups
-  users  = var.users
+  users    = var.users
 }

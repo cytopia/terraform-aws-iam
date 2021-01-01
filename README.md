@@ -22,8 +22,10 @@ This Terraform module manages AWS IAM to its full extend.
 
 ## :star: Features
 
+* Completely configurable via `terraform.tfvars` only
 * Arbitrary number of IAM **policies**, **groups**, **users** and **roles**
 * Policies can be defined via **JSON** or **templatable JSON** files
+* Policies can be defined via [`aws_iam_policy_document`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document)
 * Groups, users and roles can be attached to an arbitrary number of **custom policies**, **inline policies** and existing **policy ARN's**
 * Users can be added to an arbitrary number of **groups**
 * Users support AWS access/secret **key rotation**
@@ -35,32 +37,36 @@ This Terraform module manages AWS IAM to its full extend.
 ## :exclamation: Important
 
 When creating an IAM user with an `Inactive` access key, it is initially created with access key set to `Active`. You will have to run it a second time in order to deactivate the access key.
-This is either an issue with the terraform resource `aws_iam_access_key` or with the AWS api itself.
+This is either an issue with the terraform resource [`aws_iam_access_key`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_access_key) or with the AWS api itself.
 
 
 ## :bulb: Examples
 
 This module is very flexible and might look a bit complicated at first glance. To show off a few features which are possible, have a look at the following examples.
 
-| Example                                                 | Description                                              |
-|---------------------------------------------------------|----------------------------------------------------------|
-| **POLICIES**                                            |                                                          |
-| [Custom policies](examples/policies-custom/)            | Define custom policies with templating                   |
-| **GROUPS / USERS**                                      |                                                          |
-| [Groups](examples/group_user-groups/)                   | Defines groups                                           |
-| [Users](examples/group_user-users/)                     | Defines users                                            |
-| [Groups, users and policies](examples/group_user-full/) | Defines groups, users and policies                       |
-| [Access key rotation](examples/group_user-key-rotate/)  | Shows how to safely rotate AWS access keys for IAM users |
-| **ROLES**                                               |                                                          |
-| [Roles](examples/roles-basic/)                          | Define roles                                             |
-| [Cross-account-roles](examples/roles-cross_acc/)        | Define cross-account assumable roles                     |
-| **COMPLEX**                                             |                                                          |
-| [Identity Provider Login](examples/complex-provider/)   | Login via SAML and cross-account assume roles            |
-| [Fully managaged IAM](examples/complex-full/)           | All features enabled                                     |
-| [Enrich roles list](examples/complex-enrich_roles)      | Use terraform outputs from your custom created resources (e.g.: ARN's) as inputs in the roles list  |
+**Also see each example README.md file for more detailed explanations on each of the covered resources. They serve as a documentation purpose as well.**
+
+| Example                                                  | Description                                              |
+|----------------------------------------------------------|----------------------------------------------------------|
+| **POLICIES**                                             |                                                          |
+| [Custom policies](examples/policies--custom/)            | Define custom policies with templating                   |
+| **GROUPS / USERS**                                       |                                                          |
+| [Groups](examples/group_user--groups/)                   | Defines groups                                           |
+| [Users](examples/group_user--users/)                     | Defines users                                            |
+| [Groups, users and policies](examples/group_user--full/) | Defines groups, users and policies                       |
+| [Access key rotation](examples/group_user--key_rotate/)  | Shows how to safely rotate AWS access keys for IAM users |
+| **ROLES**                                                |                                                          |
+| [Roles](examples/roles-basic/)                           | Define roles                                             |
+| [Cross-account-roles](examples/roles--cross_account/)    | Define cross-account assumable roles                     |
+| **COMPLEX**                                              |                                                          |
+| [Identity Provider Login](examples/complex--provider/)   | Login into AWS via SAML and assume cross-account roles   |
+| [Fully managaged IAM](examples/complex--full/)           | All features enabled                                     |
+| [Enrich roles list](examples/complex--enrich_roles)      | Use terraform's [`aws_iam_policy_document`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) data source to create policies and attach them to roles.  |
 
 
 ## :computer: Usage
+
+### In-module usage
 
 ```hcl
 module "iam_roles" {
@@ -191,6 +197,176 @@ module "iam_roles" {
   }
 }
 ```
+
+### Use `terraform.tfvars`
+
+```hcl
+module "iam_roles" {
+  source = "github.com/cytopia/terraform-aws-iam?ref=v5.0.0"
+
+  # --------------------------------------------------------------------------------
+  # Account Management
+  # --------------------------------------------------------------------------------
+  account_alias       = var.account_alias
+  account_pass_policy = var.account_pass_policy
+  
+  # --------------------------------------------------------------------------------
+  # Account Identity provider
+  # --------------------------------------------------------------------------------
+  providers_saml = var.providers_saml
+  providers_oidc = var.providers_oidc
+
+  # --------------------------------------------------------------------------------
+  # Policies, Groups, Users and Roles
+  # --------------------------------------------------------------------------------
+  policies = var.policies
+  groups   = var.groups
+  users    = var.users
+  roles    = var.roles
+
+  # --------------------------------------------------------------------------------
+  # Defaults
+  # --------------------------------------------------------------------------------
+  policy_path = var.policy_path
+  policy_desc = var.policy_desc
+  group_path  = var.group_path
+  user_path   = var.user_path
+  role_path   = var.role_path
+  role_desc   = var.role_desc
+
+  role_max_session_duration  = var.role_max_session_duration
+  role_force_detach_policies = var.role_force_detach_policies
+
+  tags = var.tags
+}
+```
+`terraform.tfvars`
+```hcl
+# --------------------------------------------------------------------------------
+# Account Management
+# --------------------------------------------------------------------------------
+
+account_alias = "prod-account"
+
+account_pass_policy = {
+  manage                         = true
+  allow_users_to_change_password = true
+  hard_expiry                    = false
+  max_password_age               = 365
+  minimum_password_length        = 8
+  password_reuse_prevention      = 5
+  require_lowercase_characters   = true
+  require_numbers                = true
+  require_symbols                = true
+  require_uppercase_characters   = true
+}
+
+# --------------------------------------------------------------------------------
+# Account Identity provider
+# --------------------------------------------------------------------------------
+
+# Add a SAML provider for login
+providers_saml = [
+  {
+    name = "AzureAD"
+    file = "path/to/meta.xml"
+  }
+]
+
+# --------------------------------------------------------------------------------
+# Policies, Groups, Users and Roles
+# --------------------------------------------------------------------------------
+
+# List of policies to create
+# Policies defined here can be used by name in groups, users and roles list
+policies = [
+  {
+    name = "ro-billing"
+    path = "/assume/human/"
+    desc = "Provides read-only access to billing"
+    file = "policies/ro-billing.json"
+    vars = {}
+  },
+]
+
+# List of groups to manage
+# Groups defined here can be used in users list
+groups = [
+  {
+    name                 = "admin-group"
+    path                 = null
+    policies             = []
+    policy_arns = [
+      "arn:aws:iam::aws:policy/AdministratorAccess",
+    ]
+    inline_policies      = []
+  },
+]
+
+# List of users to manage
+users = [
+  {
+    name                 = "admin"
+    path                 = null
+    groups               = ["admin-group"]
+    access_keys          = []
+    permissions_boundary = null
+    policies             = []
+    policy_arns          = []
+    inline_policies      = []
+  },
+]
+
+# List of roles to manage
+roles = [
+  {
+    name                 = "ROLE-ADMIN"
+    path                 = ""
+    desc                 = ""
+    trust_policy_file    = "trust-policies/admin.json"
+    permissions_boundary = null
+    policies             = []
+    policy_arns = [
+      "arn:aws:iam::aws:policy/AdministratorAccess",
+    ]
+    inline_policies      = []
+  },
+  {
+    name                 = "ROLE-DEV"
+    path                 = ""
+    desc                 = ""
+    trust_policy_file    = "trust-policies/dev.json"
+    permissions_boundary = "arn:aws:iam::aws:policy/PowerUserAccess"
+    policies = [
+      "ro-billing",
+    ]
+    policy_arns = [
+      "arn:aws:iam::aws:policy/PowerUserAccess",
+    ]
+    inline_policies      = []
+  },
+]
+
+# --------------------------------------------------------------------------------
+# Defaults
+# --------------------------------------------------------------------------------
+
+policy_path = "/"
+policy_desc = "Managed by Terraform"
+group_path  = "/"
+user_path   = "/"
+role_path   = "/"
+role_desc   = "Managed by Terraform"
+
+role_max_session_duration  = 3600
+role_force_detach_policies = true
+
+tags = {
+  env   = "prod"
+  owner = "terraform"
+}
+```
+
 
 
 <!-- TFDOCS_INPUTS_START -->

@@ -1,6 +1,6 @@
-# Custom policies
+# Groups
 
-This example creates two policies on AWS. One simple JSON file and one with variable interpolations.
+This example creates policies and various different groups.
 
 
 ## Usage
@@ -52,5 +52,6 @@ No provider.
 | Name | Description |
 |------|-------------|
 | policies | Created customer managed IAM policies |
+| groups | Created groups |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
