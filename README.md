@@ -28,7 +28,7 @@ This Terraform module manages AWS IAM to its full extend.
 * Policies can be defined via [`aws_iam_policy_document`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document)
 * Groups, users and roles can be attached to an arbitrary number of **custom policies**, **inline policies** and existing **policy ARN's**
 * Users can be added to an arbitrary number of **groups**
-* Users support AWS access/secret **key rotation**
+* Users support AWS access/secret **[key rotation](examples/group_user--key_rotate/)**
 * Roles support **trusted entities**
 * Arbitrary number of **identity providers** (SAML and OIDC)
 * **Account settings**: account alias and password policy
@@ -209,7 +209,7 @@ module "iam_roles" {
   # --------------------------------------------------------------------------------
   account_alias       = var.account_alias
   account_pass_policy = var.account_pass_policy
-  
+
   # --------------------------------------------------------------------------------
   # Account Identity provider
   # --------------------------------------------------------------------------------
@@ -364,6 +364,139 @@ role_force_detach_policies = true
 tags = {
   env   = "prod"
   owner = "terraform"
+}
+```
+
+### Use Terragrunt
+```hcl
+terraform {
+  source = "github.com/cytopia/terraform-aws-iam?ref=v5.0.0"
+}
+
+inputs = {
+  # --------------------------------------------------------------------------------
+  # Account Management
+  # --------------------------------------------------------------------------------
+
+  account_alias = "prod-account"
+
+  account_pass_policy = {
+    manage                         = true
+    allow_users_to_change_password = true
+    hard_expiry                    = false
+    max_password_age               = 365
+    minimum_password_length        = 8
+    password_reuse_prevention      = 5
+    require_lowercase_characters   = true
+    require_numbers                = true
+    require_symbols                = true
+    require_uppercase_characters   = true
+  }
+
+  # --------------------------------------------------------------------------------
+  # Account Identity provider
+  # --------------------------------------------------------------------------------
+
+  # Add a SAML provider for login
+  providers_saml = [
+    {
+      name = "AzureAD"
+      file = "path/to/meta.xml"
+    }
+  ]
+
+  # --------------------------------------------------------------------------------
+  # Policies, Groups, Users and Roles
+  # --------------------------------------------------------------------------------
+
+  # List of policies to create
+  # Policies defined here can be used by name in groups, users and roles list
+  policies = [
+    {
+      name = "ro-billing"
+      path = "/assume/human/"
+      desc = "Provides read-only access to billing"
+      file = "policies/ro-billing.json"
+      vars = {}
+    },
+  ]
+
+  # List of groups to manage
+  # Groups defined here can be used in users list
+  groups = [
+    {
+      name                 = "admin-group"
+      path                 = null
+      policies             = []
+      policy_arns = [
+        "arn:aws:iam::aws:policy/AdministratorAccess",
+      ]
+      inline_policies      = []
+    },
+  ]
+
+  # List of users to manage
+  users = [
+    {
+      name                 = "admin"
+      path                 = null
+      groups               = ["admin-group"]
+      access_keys          = []
+      permissions_boundary = null
+      policies             = []
+      policy_arns          = []
+      inline_policies      = []
+    },
+  ]
+
+  # List of roles to manage
+  roles = [
+    {
+      name                 = "ROLE-ADMIN"
+      path                 = ""
+      desc                 = ""
+      trust_policy_file    = "trust-policies/admin.json"
+      permissions_boundary = null
+      policies             = []
+      policy_arns = [
+        "arn:aws:iam::aws:policy/AdministratorAccess",
+      ]
+      inline_policies      = []
+    },
+    {
+      name                 = "ROLE-DEV"
+      path                 = ""
+      desc                 = ""
+      trust_policy_file    = "trust-policies/dev.json"
+      permissions_boundary = "arn:aws:iam::aws:policy/PowerUserAccess"
+      policies = [
+        "ro-billing",
+      ]
+      policy_arns = [
+        "arn:aws:iam::aws:policy/PowerUserAccess",
+      ]
+      inline_policies      = []
+    },
+  ]
+
+  # --------------------------------------------------------------------------------
+  # Defaults
+  # --------------------------------------------------------------------------------
+
+  policy_path = "/"
+  policy_desc = "Managed by Terraform"
+  group_path  = "/"
+  user_path   = "/"
+  role_path   = "/"
+  role_desc   = "Managed by Terraform"
+
+  role_max_session_duration  = 3600
+  role_force_detach_policies = true
+
+  tags = {
+    env   = "prod"
+    owner = "terraform"
+  }
 }
 ```
 
