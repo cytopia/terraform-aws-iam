@@ -151,7 +151,7 @@ Using JSON policies with variables offers some sort of flexibility, but terrafor
 
 So is it possible to also define policies with [`aws_iam_policy_document`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) and then attach them to groups, users and/or roles in this module?
 
-Yes! See the following example for how to achieve this **[Enrich roles list](../complex--enrich_roles)**
+Yes! See the following example for how to achieve this **[Policies with custom data sources](../policies-with-custom-data-sources)**
 
 
 ## Usage
