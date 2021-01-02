@@ -3,6 +3,72 @@
 This example creates policies and various different users.
 
 
+## Overview
+
+You can define as many users as desired.
+* When using the `groups` key, respective groups must be defined in **[`var.groups`](../groups/)**.
+* When using the `policies` key, respective policies must be defined in **[`var.policies`](../policies/)**.
+
+
+## Examples
+
+**Note:** The following examples only shows the creation of a single user. You can however create as many users as desired. Also re-arranging them within the list will not trigger terraform to change or destroy resources as they're internally stored in a map (rather than a list) by their user names as keys (See module's `locals.tf` for transformation).
+
+Users are defined as follows:
+
+`terraform.tfvars`
+```hcl
+users = [
+  {
+    name     = "username-1"  # Name of the user
+    path     = "/path/"      # Defaults to 'var.user_path' if variable is set to null
+    groups   = [
+      "group-name-1",        # group-name-1 must be defined in var.groups
+      "group-name-2",        # group-name-1 must be defined in var.groups
+    ]
+    access_keys = [          # You can create up to two access keys
+      {
+        name    = "key-1"
+        pgp_key = ""
+        status  = "Inactive"
+      },
+      {
+        name    = "key-2"
+        pgp_key = ""
+        status  = "Active"
+      },
+    ]
+    permissions_boundary = "arn:aws:iam::aws:policy/PowerUserAccess"
+    policies   = [
+      "policy-name-1",        # policy-name-1 must be defined in var.policies
+      "policy-name-2",        # policy-name-2 must be defined in var.policies
+    ]
+    policy_arns = [           # Attach policies by ARN
+      "arn:aws:iam::aws:policy/AmazonEC2FullAccess",
+      "arn:aws:iam::aws:policy/AWSResourceAccessManagerFullAccess",
+    ]
+    inline_policies = [       # Attach inline policies defined via JSON files
+      {
+        name = "inline-policy-1"
+        file = "data/policies/kms-ro.json"
+        vars = {}
+      },
+      {
+        name = "inline-policy-2"
+        file = "data/policies/sqs-ro.json.tmpl"
+        vars = {  # You can use variables inside JSON files
+          var1 = "Some value",
+          var2 = "Another value",
+        }
+      },
+    ]
+  },
+]
+```
+
+If you want to attach dyamic policies created via [`aws_iam_policy_document`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document). Have a look at this **[Example](../policies-with-custom-data-sources)**.
+
+
 ## Usage
 
 To run this example you need to execute:

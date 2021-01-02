@@ -2,9 +2,14 @@
 
 This example creates policies and various different groups.
 
+
 ## Overview
 
-You can define as many groups as desired and reference them by their names in `var.users` in order to attach as many groups to a specific user as needed.
+You can define as many groups as desired and reference them by their names in **[`var.users`](../users/)** in order to attach as many groups to a specific user as needed.
+* When using the `policies` key, respective policies must be defined in **[`var.policies`](../policies/)**.
+
+
+## Examples
 
 **Note:** The following examples only shows the creation of a single group.
 You can however create as many groups as desired. Also re-arranging them within the list will not
