@@ -64,7 +64,7 @@ This module is very flexible and might look a bit complicated at first glance. T
 
 ## :computer: Usage
 
-1. [Use `terraform.tfvars` only](#use-terraform-tfvars-only)
+1. [Use `terraform.tfvars` only](#use-terraformtfvars-only)
 2. [Use Module](#use-module)
 3. [Use Terragrunt](#use-terragrunt)
 
