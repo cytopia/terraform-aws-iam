@@ -19,6 +19,8 @@
 
 This Terraform module manages AWS IAM to its full extend.
 
+It is only required to have a single module definition per AWS account, as this module allows the creation of unlimited resources and you will therefore have an auditable single source of truth for IAM.
+
 
 ## :star: Features
 
