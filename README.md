@@ -44,12 +44,13 @@ This is either an issue with the terraform resource [`aws_iam_access_key`](https
 
 This module is very flexible and might look a bit complicated at first glance. To show off a few features which are possible, have a look at the following examples.
 
-**Also see each example README.md file for more detailed explanations on each of the covered resources. They serve as a documentation purpose as well.**
+**:page_facing_up: Also see each example README.md file for more detailed explanations on each of the covered resources. They serve as a documentation purpose as well.**
 
 | Example                                                           | Description                                              |
 |-------------------------------------------------------------------|----------------------------------------------------------|
 | **POLICIES**                                                      |                                                          |
-| [Custom policies](examples/policies/)                             | Define custom policies with templating                   |
+| [JSON policies](examples/policies/)                               | Define JSON policies with variable templating            |
+| [Policies with custom data sources](examples/policies-with-custom-data-sources) | Use terraform's [`aws_iam_policy_document`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) data source to create policies and attach them to defined roles.  |
 | **GROUPS / USERS**                                                |                                                          |
 | [Groups](examples/groups/)                                        | Defines groups                                           |
 | [Users](examples/users/)                                          | Defines users                                            |
@@ -58,8 +59,7 @@ This module is very flexible and might look a bit complicated at first glance. T
 | **ROLES**                                                         |                                                          |
 | [Roles](examples/roles/)                                          | Define roles (cross-account assumable)                   |
 | **ADVANCED**                                                      |                                                          |
-| [SAML Login](examples/saml-login/)                                | Login into AWS via SAML identity provider and assume cross-account roles |
-| [Policies with custom data sources](examples/policies-with-custom-data-sources) | Use terraform's [`aws_iam_policy_document`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) data source to create policies and attach them to defined roles.  |
+| [SAML Login](examples/saml-login/)                                | Login into AWS via SAML identity provider and assume cross-account roles. Also read about best-practices for separating login roles and permission roles. |
 
 
 ## :computer: Usage
