@@ -25,7 +25,7 @@ This Terraform module manages AWS IAM to its full extend.
 * Completely configurable via `terraform.tfvars` only
 * Arbitrary number of IAM **policies**, **groups**, **users** and **roles**
 * Policies can be defined via **JSON** or **templatable JSON** files
-* Policies can be defined via [`aws_iam_policy_document`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document)
+* Policies can be defined via [`aws_iam_policy_document`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) ([Example here](examples/policies-with-custom-data-sources))
 * Groups, users and roles can be attached to an arbitrary number of **custom policies**, **inline policies** and existing **policy ARN's**
 * Users can be added to an arbitrary number of **groups**
 * Users support AWS access/secret **[key rotation](examples/access-key-rotation/)**
@@ -64,7 +64,11 @@ This module is very flexible and might look a bit complicated at first glance. T
 
 ## :computer: Usage
 
-### 1/3 Use `terraform.tfvars` only
+1. [Use `terraform.tfvars` only](#use-terraform-tfvars-only)
+2. [Use Module](#use-module)
+3. [Use Terragrunt](#use-terragrunt)
+
+### Use `terraform.tfvars` only
 
 You can simply clone this repository and add your `terraform.tfvars` file into the root of this directory.
 
@@ -97,7 +101,11 @@ account_pass_policy = {
 providers_saml = [
   {
     name = "AzureAD"
-    file = "path/to/meta.xml"
+    file = "path/to/azure/meta.xml"
+  },
+  {
+    name = "ADFS"
+    file = "path/to/adfs/meta.xml"
   }
 ]
 
@@ -196,13 +204,13 @@ tags = {
 ```
 
 
-### 2/3 Use Module
+### Use Module
 
 Create your own module by sourcing this module.
 
 ```hcl
 module "iam_roles" {
-  source = "github.com/cytopia/terraform-aws-iam?ref=v5.0.4"
+  source = "github.com/cytopia/terraform-aws-iam?ref=v5.0.5"
 
   # --------------------------------------------------------------------------------
   # Account Management
@@ -231,7 +239,11 @@ module "iam_roles" {
   providers_saml = [
     {
       name = "AzureAD"
-      file = "path/to/meta.xml"
+      file = "path/to/azure/meta.xml"
+    },
+    {
+      name = "ADFS"
+      file = "path/to/adfs/meta.xml"
     }
   ]
 
@@ -330,13 +342,13 @@ module "iam_roles" {
 }
 ```
 
-### 3/3 Use Terragrunt
+### Use Terragrunt
 
 Wrap this module into Terragrunt
 
 ```hcl
 terraform {
-  source = "github.com/cytopia/terraform-aws-iam?ref=v5.0.4"
+  source = "github.com/cytopia/terraform-aws-iam?ref=v5.0.5"
 }
 
 inputs = {
@@ -363,11 +375,15 @@ inputs = {
   # Account Identity provider
   # --------------------------------------------------------------------------------
 
-  # Add a SAML provider for login
+  # Add a SAML providers for login
   providers_saml = [
     {
       name = "AzureAD"
-      file = "path/to/meta.xml"
+      file = "path/to/azure/meta.xml"
+    },
+    {
+      name = "ADFS"
+      file = "path/to/adfs/meta.xml"
     }
   ]
 
