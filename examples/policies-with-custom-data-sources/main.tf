@@ -65,6 +65,6 @@ resource "aws_iam_policy" "s3" {
   policy      = data.aws_iam_policy_document.s3.json
 
   lifecycle {
-    create_before_destroy = true
+    create_before_destroy = false
   }
 }

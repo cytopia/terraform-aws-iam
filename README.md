@@ -19,7 +19,7 @@
 
 This Terraform module manages AWS IAM to its full extend.
 
-It is only required to have a single module definition per AWS account, as this module allows the creation of unlimited resources and you will therefore have an auditable single source of truth for IAM.
+It is only required to have a single module invocation per AWS account, as this module allows the creation of unlimited resources and you will therefore have an auditable single source of truth for IAM.
 
 
 ## :star: Features
@@ -580,8 +580,8 @@ Type:
 ```hcl
 list(object({
     name = string      # Name of the policy
-    path = string      # Defaults to 'var.policy_path' variable is set to null
-    desc = string      # Defaults to 'var.policy_desc' variable is set to null
+    path = string      # Defaults to 'var.policy_path' if variable is set to null
+    desc = string      # Defaults to 'var.policy_desc' if variable is set to null
     file = string      # Path to json or json.tmpl file of policy
     vars = map(string) # Policy template variables {key: val, ...}
   }))
@@ -620,7 +620,7 @@ Type:
 ```hcl
 list(object({
     name   = string       # Name of the user
-    path   = string       # Defaults to 'var.user_path' variable is set to null
+    path   = string       # Defaults to 'var.user_path' if variable is set to null
     groups = list(string) # List of group names to add this user to
     access_keys = list(object({
       name    = string # IaC identifier for first or second IAM access key (not used on AWS)
@@ -649,8 +649,8 @@ Type:
 ```hcl
 list(object({
     name                 = string       # Name of the role
-    path                 = string       # Defaults to 'var.role_path' variable is set to null
-    desc                 = string       # Defaults to 'var.role_desc' variable is set to null
+    path                 = string       # Defaults to 'var.role_path' if variable is set to null
+    desc                 = string       # Defaults to 'var.role_desc' if variable is set to null
     trust_policy_file    = string       # Path to file of trust/assume policy
     permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)
     policies             = list(string) # List of names of policies (must be defined in var.policies)
