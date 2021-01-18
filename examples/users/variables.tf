@@ -2,8 +2,8 @@ variable "policies" {
   description = "A list of dictionaries defining all policies."
   type = list(object({
     name = string      # Name of the policy
-    path = string      # Defaults to 'var.policy_path' variable is set to null
-    desc = string      # Defaults to 'var.policy_desc' variable is set to null
+    path = string      # Defaults to 'var.policy_path' if variable is set to null
+    desc = string      # Defaults to 'var.policy_desc' if variable is set to null
     file = string      # Path to json or json.tmpl file of policy
     vars = map(string) # Policy template variables {key: val, ...}
   }))
@@ -14,7 +14,7 @@ variable "users" {
   description = "A list of dictionaries defining all users."
   type = list(object({
     name   = string       # Name of the user
-    path   = string       # Defaults to 'var.user_path' variable is set to null
+    path   = string       # Defaults to 'var.user_path' if variable is set to null
     groups = list(string) # List of group names to add this user to
     access_keys = list(object({
       name    = string # IaC identifier for first or second IAM access key (not used on AWS)

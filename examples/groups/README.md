@@ -11,7 +11,7 @@ You can define as many groups as desired and reference them by their names in **
 
 ## Examples
 
-**Note:** The following examples only shows the creation of a single group.
+**Note:** The following example only shows the creation of a single group.
 You can however create as many groups as desired. Also re-arranging them within the list will not
 trigger terraform to change or destroy resources as they're internally stored in a map (rather than a list) by their group names as keys (See module's `locals.tf` for transformation).
 
@@ -50,7 +50,7 @@ groups = [
 ]
 ```
 
-If you want to attach dyamic policies created via [`aws_iam_policy_document`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document). Have a look at this **[Example](../policies-with-custom-data-sources)**.
+If you want to attach dynamic policies created via [`aws_iam_policy_document`](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document). Have a look at this **[Example](../policies-with-custom-data-sources)**.
 
 
 ## Usage
@@ -79,7 +79,7 @@ No provider.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| policies | A list of dictionaries defining all policies. | <pre>list(object({<br>    name = string      # Name of the policy<br>    path = string      # Defaults to 'var.policy_path' variable is set to null<br>    desc = string      # Defaults to 'var.policy_desc' variable is set to null<br>    file = string      # Path to json or json.tmpl file of policy<br>    vars = map(string) # Policy template variables {key: val, ...}<br>  }))</pre> | `[]` | no |
+| policies | A list of dictionaries defining all policies. | <pre>list(object({<br>    name = string      # Name of the policy<br>    path = string      # Defaults to 'var.policy_path' if variable is set to null<br>    desc = string      # Defaults to 'var.policy_desc' if variable is set to null<br>    file = string      # Path to json or json.tmpl file of policy<br>    vars = map(string) # Policy template variables {key: val, ...}<br>  }))</pre> | `[]` | no |
 | groups | A list of dictionaries defining all groups. | <pre>list(object({<br>    name        = string       # Name of the group<br>    path        = string       # Defaults to 'var.group_path' if variable is set to null<br>    policies    = list(string) # List of names of policies (must be defined in var.policies)<br>    policy_arns = list(string) # List of existing policy ARN's<br>    inline_policies = list(object({<br>      name = string      # Name of the inline policy<br>      file = string      # Path to json or json.tmpl file of policy<br>      vars = map(string) # Policy template variables {key = val, ...}<br>    }))<br>  }))</pre> | `[]` | no |
 
 ## Outputs
