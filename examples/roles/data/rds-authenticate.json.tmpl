@@ -1,0 +1,16 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "RDSAuthenticationAllow",
+      "Effect": "Allow",
+      "Action": [
+        "rds-db:connect"
+      ],
+      "Resource": [
+        "arn:aws:rds-db:eu-central-1:${aws_account_id}:dbuser:*/iam_user_rw",
+        "arn:aws:rds-db:eu-central-1:${aws_account_id}:dbuser:*/iam_user_ro"
+      ]
+    }
+  ]
+}
