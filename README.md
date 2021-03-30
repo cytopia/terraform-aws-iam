@@ -159,6 +159,7 @@ users = [
 roles = [
   {
     name                 = "ROLE-ADMIN"
+    instance_profile     = null
     path                 = ""
     desc                 = ""
     trust_policy_file    = "trust-policies/admin.json"
@@ -171,6 +172,7 @@ roles = [
   },
   {
     name                 = "ROLE-DEV"
+    instance_profile     = null
     path                 = ""
     desc                 = ""
     trust_policy_file    = "trust-policies/dev.json"
@@ -297,6 +299,7 @@ module "iam_roles" {
   roles = [
     {
       name                 = "ROLE-ADMIN"
+      instance_profile     = null
       path                 = ""
       desc                 = ""
       trust_policy_file    = "trust-policies/admin.json"
@@ -309,6 +312,7 @@ module "iam_roles" {
     },
     {
       name                 = "ROLE-DEV"
+      instance_profile     = null
       path                 = ""
       desc                 = ""
       trust_policy_file    = "trust-policies/dev.json"
@@ -437,6 +441,7 @@ inputs = {
   roles = [
     {
       name                 = "ROLE-ADMIN"
+      instance_profile     = null
       path                 = ""
       desc                 = ""
       trust_policy_file    = "trust-policies/admin.json"
@@ -449,6 +454,7 @@ inputs = {
     },
     {
       name                 = "ROLE-DEV"
+      instance_profile     = null
       path                 = ""
       desc                 = ""
       trust_policy_file    = "trust-policies/dev.json"
@@ -649,6 +655,7 @@ Type:
 ```hcl
 list(object({
     name                 = string       # Name of the role
+    instance_profile     = string       # Name of the instance profile
     path                 = string       # Defaults to 'var.role_path' if variable is set to null
     desc                 = string       # Defaults to 'var.role_desc' if variable is set to null
     trust_policy_file    = string       # Path to file of trust/assume policy
