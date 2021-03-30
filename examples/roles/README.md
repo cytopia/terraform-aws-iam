@@ -25,6 +25,7 @@ The following defined role has administrator access on the provisioned AWS accou
 roles = [
   {
     name                 = "ROLE-ADMIN"
+    instance_profile     = null
     path                 = null
     desc                 = null
     trust_policy_file    = "data/trust-policies/admin.json"
@@ -85,7 +86,7 @@ No provider.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | policies | A list of dictionaries defining all policies. | <pre>list(object({<br>    name = string      # Name of the policy<br>    path = string      # Defaults to 'var.policy_path' if variable is set to null<br>    desc = string      # Defaults to 'var.policy_desc' if variable is set to null<br>    file = string      # Path to json or json.tmpl file of policy<br>    vars = map(string) # Policy template variables {key: val, ...}<br>  }))</pre> | `[]` | no |
-| roles | A list of dictionaries defining all roles. | <pre>list(object({<br>    name                 = string       # Name of the role<br>    path                 = string       # Defaults to 'var.role_path' if variable is set to null<br>    desc                 = string       # Defaults to 'var.role_desc' if variable is set to null<br>    trust_policy_file    = string       # Path to file of trust/assume policy<br>    permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)<br>    policies             = list(string) # List of names of policies (must be defined in var.policies)<br>    policy_arns          = list(string) # List of existing policy ARN's<br>    inline_policies = list(object({<br>      name = string      # Name of the inline policy<br>      file = string      # Path to json or json.tmpl file of policy<br>      vars = map(string) # Policy template variables {key = val, ...}<br>    }))<br>  }))</pre> | `[]` | no |
+| roles | A list of dictionaries defining all roles. | <pre>list(object({<br>    name                 = string       # Name of the role<br>    instance_profile     = string       # Name of the instance profile (attach the role to an instance profile)<br>    path                 = string       # Defaults to 'var.role_path' if variable is set to null<br>    desc                 = string       # Defaults to 'var.role_desc' if variable is set to null<br>    trust_policy_file    = string       # Path to file of trust/assume policy<br>    permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)<br>    policies             = list(string) # List of names of policies (must be defined in var.policies)<br>    policy_arns          = list(string) # List of existing policy ARN's<br>    inline_policies = list(object({<br>      name = string      # Name of the inline policy<br>      file = string      # Path to json or json.tmpl file of policy<br>      vars = map(string) # Policy template variables {key = val, ...}<br>    }))<br>  }))</pre> | `[]` | no |
 
 ## Outputs
 

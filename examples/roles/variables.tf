@@ -14,6 +14,7 @@ variable "roles" {
   description = "A list of dictionaries defining all roles."
   type = list(object({
     name                 = string       # Name of the role
+    instance_profile     = string       # Name of the instance profile (attach the role to an instance profile)
     path                 = string       # Defaults to 'var.role_path' if variable is set to null
     desc                 = string       # Defaults to 'var.role_desc' if variable is set to null
     trust_policy_file    = string       # Path to file of trust/assume policy
