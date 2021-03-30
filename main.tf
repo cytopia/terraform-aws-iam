@@ -288,3 +288,21 @@ resource "aws_iam_role_policy" "inline_policy_attachments" {
   # so we must explicitly tell it.
   depends_on = [aws_iam_role.roles]
 }
+
+# -------------------------------------------------------------------------------------------------
+# 7. Instance profiles
+# -------------------------------------------------------------------------------------------------
+
+# Create roles
+resource "aws_iam_instance_profile" "profiles" {
+  for_each = { for role in var.roles : role.name => role if role.instance_profile != null }
+
+  name = lookup(each.value, "instance_profile")
+  path = lookup(each.value, "path", null) == null ? var.role_path : lookup(each.value, "path")
+  role = lookup(each.value, "name")
+
+  tags = merge(
+    map("Name", lookup(each.value, "name")),
+    var.tags
+  )
+}
