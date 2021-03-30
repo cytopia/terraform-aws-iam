@@ -11,6 +11,7 @@ policies = [
 roles = [
   {
     name                 = "ROLE-CUSTOM-POLICY"
+    instance_profile     = null
     path                 = null
     desc                 = null
     trust_policy_file    = "data/trust-policy-file.json"
@@ -21,6 +22,7 @@ roles = [
   },
   {
     name                 = "ROLE-POLICY-ARN"
+    instance_profile     = null
     path                 = null
     desc                 = null
     trust_policy_file    = "data/trust-policy-file.json"
@@ -31,6 +33,7 @@ roles = [
   },
   {
     name                 = "ROLE-INLINE-POLICY"
+    instance_profile     = null
     path                 = null
     desc                 = null
     trust_policy_file    = "data/trust-policy-file.json"
@@ -81,6 +84,17 @@ roles = [
     permissions_boundary = "arn:aws:iam::aws:policy/PowerUserAccess"
     policies             = []
     policy_arns          = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+    inline_policies      = []
+  },
+  {
+    name                 = "ROLE-ATTACHED-TO-AN-INSTANCE-PROFILE"
+    instance_profile     = "MY-INSTANCE-PROFILE-1"
+    path                 = null
+    desc                 = null
+    trust_policy_file    = "data/trust-policy-file.json"
+    permissions_boundary = null
+    policies             = []
+    policy_arns          = ["arn:aws:iam::aws:policy/PowerUserAccess"]
     inline_policies      = []
   },
 ]
