@@ -24,14 +24,15 @@ The following defined role has administrator access on the provisioned AWS accou
 ```hcl
 roles = [
   {
-    name                 = "ROLE-ADMIN"
-    path                 = null
-    desc                 = null
-    trust_policy_file    = "data/trust-policies/admin.json"
-    permissions_boundary = null
-    policies             = []
-    inline_policies      = []
-    policy_arns          = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+    name                    = "ROLE-ADMIN"
+    path                    = null
+    desc                    = null
+    trust_policy_file       = "data/trust-policies/admin.json"
+    permissions_boundary    = null
+    policies                = []
+    inline_policies         = []
+    policy_arns             = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+    create_instance_profile = false
   },
 ]
 ```

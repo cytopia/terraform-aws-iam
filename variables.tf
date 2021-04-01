@@ -251,6 +251,7 @@ variable "roles" {
       file = string      # Path to json or json.tmpl file of policy
       vars = map(string) # Policy template variables {key = val, ...}
     }))
+    create_instance_profile = bool
   }))
   default = []
 }

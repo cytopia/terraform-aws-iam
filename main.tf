@@ -248,6 +248,13 @@ resource "aws_iam_role" "roles" {
   )
 }
 
+resource "aws_iam_instance_profile" "test_profile" {
+  for_each = { for role in var.roles : role.name => role if role.create_instance_profile == true  }
+  name = lookup(each.value, "name")
+  path = lookup(each.value, "path", null) == null ? var.role_path : lookup(each.value, "path")
+  role = aws_iam_role.roles[each.value.name].name
+}
+
 # Attach customer managed policies to roles
 resource "aws_iam_role_policy_attachment" "policy_attachments" {
   for_each = local.role_policies
