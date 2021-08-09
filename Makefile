@@ -79,12 +79,9 @@ test: _pull-tf
 		echo "------------------------------------------------------------"; \
 		if docker run $$(tty -s && echo "-it" || echo) --rm -v "$(CURRENT_DIR):/t" --workdir "$${DOCKER_PATH}" hashicorp/terraform:$(TF_VERSION) \
 			init \
-				-verify-plugins=true \
-				-lock=false \
 				-upgrade=true \
 				-reconfigure \
 				-input=false \
-				-get-plugins=true \
 				-get=true \
 				.; then \
 			echo "OK"; \
