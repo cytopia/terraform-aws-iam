@@ -23,13 +23,13 @@ roles = [
     inline_policies      = []
   },
   {
-    name                 = "ROLE-POLICY-ARN"
-    instance_profile     = null
-    path                 = null
-    desc                 = null
-    trust_policy_file    = null
-    trust_policy_body    = "data/trust-policy-template.json.tmpl"
-    trust_policy_vars    = {
+    name              = "ROLE-POLICY-ARN"
+    instance_profile  = null
+    path              = null
+    desc              = null
+    trust_policy_file = null
+    trust_policy_body = "data/trust-policy-template.json.tmpl"
+    trust_policy_vars = {
       aws_account_id = "123456789012"
     }
     permissions_boundary = null
