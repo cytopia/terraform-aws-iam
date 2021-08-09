@@ -1,0 +1,15 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "AWS": [
+          "arn:aws:iam::${aws_account_id}:role/federation/LOGIN-ROLE"
+        ]
+      },
+      "Condition": {}
+    }
+  ]
+}
