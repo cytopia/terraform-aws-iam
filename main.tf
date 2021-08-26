@@ -232,7 +232,7 @@ resource "aws_iam_role" "roles" {
   description = lookup(each.value, "desc", null) == null ? var.role_desc : lookup(each.value, "desc")
 
   # This policy defines who/what is allowed to use the current role
-  assume_role_policy = lookup(each.value, "trust_policy_body") == null ? file(lookup(each.value, "trust_policy_file")) : templatefile(lookup(each.value, "trust_policy_body"), lookup(each.value, "trust_policy_vars"))
+  assume_role_policy = lookup(each.value, "trust_policy_vars") == null ? file(lookup(each.value, "trust_policy_file")) : templatefile(lookup(each.value, "trust_policy_file"), lookup(each.value, "trust_policy_vars"))
 
   # The boundary defines the maximum allowed permissions which cannot exceed.
   # Even if the policy has higher permission, the boundary sets the final limit

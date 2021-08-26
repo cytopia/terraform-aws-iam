@@ -658,8 +658,7 @@ list(object({
     instance_profile     = string       # Name of the instance profile
     path                 = string       # Defaults to 'var.role_path' if variable is set to null
     desc                 = string       # Defaults to 'var.role_desc' if variable is set to null
-    trust_policy_file    = string       # Path to file of trust/assume policy
-    trust_policy_body    = string       # Path to template file of trust/assume policy
+    trust_policy_file    = string       # Path to file of trust/assume policy. Will be templated if vars are passed.
     trust_policy_vars    = map(string)  # Policy template variables {key = val, ...}
     permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)
     policies             = list(string) # List of names of policies (must be defined in var.policies)
