@@ -263,11 +263,13 @@ variable "roles" {
 # -------------------------------------------------------------------------------------------------
 
 variable "policy_path" {
+  type        = string
   description = "The default path under which to create the policy if not specified in the policies list. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure."
   default     = "/"
 }
 
 variable "policy_desc" {
+  type        = string
   description = "The default description of the policy."
   default     = "Managed by Terraform"
 }
@@ -278,6 +280,7 @@ variable "policy_desc" {
 # -------------------------------------------------------------------------------------------------
 
 variable "group_path" {
+  type        = string
   description = "The path under which to create the group. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure."
   default     = "/"
 }
@@ -288,6 +291,7 @@ variable "group_path" {
 # -------------------------------------------------------------------------------------------------
 
 variable "user_path" {
+  type        = string
   description = "The path under which to create the user. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure."
   default     = "/"
 }
@@ -298,21 +302,25 @@ variable "user_path" {
 # -------------------------------------------------------------------------------------------------
 
 variable "role_path" {
+  type        = string
   description = "The path under which to create the role. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure."
   default     = "/"
 }
 
 variable "role_desc" {
+  type        = string
   description = "The description of the role."
   default     = "Managed by Terraform"
 }
 
 variable "role_max_session_duration" {
+  type        = number
   description = "The maximum session duration (in seconds) that you want to set for the specified role. This setting can have a value from 1 hour to 12 hours specified in seconds."
-  default     = "3600"
+  default     = 3600
 }
 
 variable "role_force_detach_policies" {
+  type        = bool
   description = "Specifies to force detaching any policies the role has before destroying it."
   default     = true
 }

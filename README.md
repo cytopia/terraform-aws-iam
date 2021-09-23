@@ -4,16 +4,16 @@
 **[Important](#exclamation-important)** |
 **[Examples](#bulb-examples)** |
 **[Usage](#computer-usage)** |
+**[Requirements](#requirements)** |
 **[Inputs](#required-inputs)** |
 **[Outputs](#outputs)** |
 **[Related projects](#related-projects)** |
 **[Authors](#authors)** |
 **[License](#license)**
 
-[![lint](https://github.com/cytopia/terraform-aws-iam/workflows/lint/badge.svg)](https://github.com/cytopia/terraform-aws-iam/actions?query=workflow%3Alint)
-[![test](https://github.com/cytopia/terraform-aws-iam/workflows/test/badge.svg)](https://github.com/cytopia/terraform-aws-iam/actions?query=workflow%3Atest)
-[![Tag](https://img.shields.io/github/tag/cytopia/terraform-aws-iam.svg)](https://github.com/cytopia/terraform-aws-iam/releases)
-[![Terraform](https://img.shields.io/badge/Terraform--registry-aws--iam-brightgreen.svg)](https://registry.terraform.io/modules/cytopia/iam/aws/)
+[![lint](https://github.com/Flaconi/terraform-aws-iam-roles/workflows/lint/badge.svg)](https://github.com/Flaconi/terraform-aws-iam-roles/actions?query=workflow%3Alint)
+[![test](https://github.com/Flaconi/terraform-aws-iam-roles/workflows/test/badge.svg)](https://github.com/Flaconi/terraform-aws-iam-roles/actions?query=workflow%3Atest)
+[![Tag](https://img.shields.io/github/tag/Flaconi/terraform-aws-iam-roles.svg)](https://github.com/Flaconi/terraform-aws-iam-roles/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 
@@ -214,7 +214,7 @@ Create your own module by sourcing this module.
 
 ```hcl
 module "iam_roles" {
-  source = "github.com/cytopia/terraform-aws-iam?ref=v5.0.5"
+  source = "github.com/Flaconi/terraform-aws-iam-roles?ref=v6.1.0"
 
   # --------------------------------------------------------------------------------
   # Account Management
@@ -354,7 +354,7 @@ Wrap this module into Terragrunt
 
 ```hcl
 terraform {
-  source = "github.com/cytopia/terraform-aws-iam?ref=v5.0.5"
+  source = "github.com/Flaconi/terraform-aws-iam-roles?ref=v6.1.0"
 }
 
 inputs = {
@@ -489,6 +489,18 @@ inputs = {
   }
 }
 ```
+
+
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Requirements
+
+The following requirements are needed by this module:
+
+- terraform (>= 0.12.26)
+
+- aws (>= 3)
+
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 
 <!-- TFDOCS_INPUTS_START -->
@@ -725,9 +737,9 @@ Default: `"Managed by Terraform"`
 
 Description: The maximum session duration (in seconds) that you want to set for the specified role. This setting can have a value from 1 hour to 12 hours specified in seconds.
 
-Type: `string`
+Type: `number`
 
-Default: `"3600"`
+Default: `3600`
 
 ### role\_force\_detach\_policies
 
