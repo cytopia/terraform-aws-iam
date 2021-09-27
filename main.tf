@@ -133,7 +133,9 @@ resource "aws_iam_user" "users" {
   permissions_boundary = each.value.permissions_boundary
 
   tags = merge(
-    map("Name", lookup(each.value, "name")),
+    {
+      Name = lookup(each.value, "name")
+    },
     var.tags
   )
 }
@@ -233,7 +235,9 @@ resource "aws_iam_role" "roles" {
   force_detach_policies = var.role_force_detach_policies
 
   tags = merge(
-    map("Name", lookup(each.value, "name")),
+    {
+      Name = lookup(each.value, "name")
+    },
     var.tags
   )
 }
@@ -292,7 +296,9 @@ resource "aws_iam_instance_profile" "profiles" {
   role = lookup(each.value, "name")
 
   tags = merge(
-    map("Name", lookup(each.value, "name")),
+    {
+      Name = lookup(each.value, "name")
+    },
     var.tags
   )
 }

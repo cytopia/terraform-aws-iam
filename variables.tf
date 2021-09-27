@@ -332,6 +332,6 @@ variable "role_force_detach_policies" {
 
 variable "tags" {
   description = "Key-value mapping of tags for the IAM role or user."
-  type        = map(any)
+  type        = map(string)
   default     = {}
 }

@@ -753,7 +753,7 @@ Default: `true`
 
 Description: Key-value mapping of tags for the IAM role or user.
 
-Type: `map(any)`
+Type: `map(string)`
 
 Default: `{}`
 

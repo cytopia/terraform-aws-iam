@@ -202,7 +202,7 @@ No requirements.
 | role\_desc | The description of the role. | `string` | `"Managed by Terraform"` | no |
 | role\_max\_session\_duration | The maximum session duration (in seconds) that you want to set for the specified role. This setting can have a value from 1 hour to 12 hours specified in seconds. | `number` | `3600` | no |
 | role\_force\_detach\_policies | Specifies to force detaching any policies the role has before destroying it. | `bool` | `true` | no |
-| tags | Key-value mapping of tags for the IAM role or user. | `map(any)` | `{}` | no |
+| tags | Key-value mapping of tags for the IAM role or user. | `map(string)` | `{}` | no |
 
 ## Outputs
 
