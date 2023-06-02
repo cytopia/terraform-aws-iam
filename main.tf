@@ -55,10 +55,10 @@ resource "aws_iam_openid_connect_provider" "default" {
 resource "aws_iam_policy" "policies" {
   for_each = local.policies
 
-  name        = lookup(each.value, "name")
-  path        = lookup(each.value, "path", null) == null ? var.policy_path : lookup(each.value, "path")
-  description = lookup(each.value, "desc", null) == null ? var.policy_desc : lookup(each.value, "desc")
-  policy      = templatefile(lookup(each.value, "file"), lookup(each.value, "vars"))
+  name        = each.value.name
+  path        = each.value.path != null ? each.value.path : var.policy_path
+  description = each.value.desc != null ? each.value.desc : var.policy_desc
+  policy      = templatefile(each.value.file, each.value.vars)
 }
 
 
@@ -70,8 +70,8 @@ resource "aws_iam_policy" "policies" {
 resource "aws_iam_group" "groups" {
   for_each = { for group in var.groups : group.name => group }
 
-  name = lookup(each.value, "name")
-  path = lookup(each.value, "path", null) == null ? var.group_path : lookup(each.value, "path")
+  name = each.value.name
+  path = each.value.path != null ? each.value.path : var.group_path
 }
 
 # Attach customer managed policies to group
@@ -108,7 +108,7 @@ resource "aws_iam_group_policy" "inline_policy_attachments" {
 
   name   = each.value.name
   group  = replace(each.key, format(":%s", each.value.name), "")
-  policy = templatefile(lookup(each.value, "file"), lookup(each.value, "vars"))
+  policy = templatefile(each.value.file, each.value.vars)
 
   # Terraform has no info that aws_iam_users must be run first in order to create the users,
   # so we must explicitly tell it.
@@ -125,8 +125,8 @@ resource "aws_iam_group_policy" "inline_policy_attachments" {
 resource "aws_iam_user" "users" {
   for_each = { for user in var.users : user.name => user }
 
-  name = lookup(each.value, "name")
-  path = lookup(each.value, "path", null) == null ? var.user_path : lookup(each.value, "path")
+  name = each.value.name
+  path = each.value.path != null ? each.value.path : var.user_path
 
   # The boundary defines the maximum allowed permissions which cannot exceed.
   # Even if the policy has higher permission, the boundary sets the final limit
@@ -134,7 +134,7 @@ resource "aws_iam_user" "users" {
 
   tags = merge(
     {
-      Name = lookup(each.value, "name")
+      Name = each.value.name
     },
     var.tags
   )
@@ -174,7 +174,7 @@ resource "aws_iam_user_policy" "inline_policy_attachments" {
 
   name   = each.value.name
   user   = replace(each.key, format(":%s", each.value.name), "")
-  policy = templatefile(lookup(each.value, "file"), lookup(each.value, "vars"))
+  policy = templatefile(each.value.file, each.value.vars)
 
   # Terraform has no info that aws_iam_users must be run first in order to create the users,
   # so we must explicitly tell it.
@@ -219,12 +219,12 @@ resource "aws_iam_user_group_membership" "group_membership" {
 resource "aws_iam_role" "roles" {
   for_each = { for role in var.roles : role.name => role }
 
-  name        = lookup(each.value, "name")
-  path        = lookup(each.value, "path", null) == null ? var.role_path : lookup(each.value, "path")
-  description = lookup(each.value, "desc", null) == null ? var.role_desc : lookup(each.value, "desc")
+  name        = each.value.name
+  path        = each.value.path != null ? each.value.path : var.role_path
+  description = each.value.desc != null ? each.value.desc : var.role_desc
 
   # This policy defines who/what is allowed to use the current role
-  assume_role_policy = lookup(each.value, "trust_policy_vars") == null ? file(lookup(each.value, "trust_policy_file")) : templatefile(lookup(each.value, "trust_policy_file"), lookup(each.value, "trust_policy_vars"))
+  assume_role_policy = templatefile(each.value.trust_policy_file, each.value.trust_policy_vars)
 
   # The boundary defines the maximum allowed permissions which cannot exceed.
   # Even if the policy has higher permission, the boundary sets the final limit
@@ -236,7 +236,7 @@ resource "aws_iam_role" "roles" {
 
   tags = merge(
     {
-      Name = lookup(each.value, "name")
+      Name = each.value.name
     },
     var.tags
   )
@@ -276,7 +276,7 @@ resource "aws_iam_role_policy" "inline_policy_attachments" {
 
   name   = each.value.name
   role   = replace(each.key, format(":%s", each.value.name), "")
-  policy = templatefile(lookup(each.value, "file"), lookup(each.value, "vars"))
+  policy = templatefile(each.value.file, each.value.vars)
 
   # Terraform has no info that aws_iam_roles must be run first in order to create the roles,
   # so we must explicitly tell it.
@@ -291,13 +291,13 @@ resource "aws_iam_role_policy" "inline_policy_attachments" {
 resource "aws_iam_instance_profile" "profiles" {
   for_each = { for role in var.roles : role.name => role if role.instance_profile != null }
 
-  name = lookup(each.value, "instance_profile")
-  path = lookup(each.value, "path", null) == null ? var.role_path : lookup(each.value, "path")
-  role = lookup(each.value, "name")
+  name = each.value.instance_profile
+  path = each.value.path != null ? each.value.path : var.role_path
+  role = each.value.name
 
   tags = merge(
     {
-      Name = lookup(each.value, "name")
+      Name = each.value.name
     },
     var.tags
   )
