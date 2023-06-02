@@ -490,29 +490,40 @@ inputs = {
 }
 ```
 
+<!-- TFDOCS_HEADER_START -->
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+
+<!-- TFDOCS_HEADER_END -->
+
+<!-- TFDOCS_PROVIDER_START -->
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5 |
+
+<!-- TFDOCS_PROVIDER_END -->
+
+<!-- TFDOCS_REQUIREMENTS_START -->
 ## Requirements
 
-The following requirements are needed by this module:
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5 |
 
-- terraform (>= 1.3)
-
-- aws (>= 5)
-
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
-
+<!-- TFDOCS_REQUIREMENTS_END -->
 
 <!-- TFDOCS_INPUTS_START -->
 ## Required Inputs
 
-No required input.
+No required inputs.
 
 ## Optional Inputs
 
 The following input variables are optional (have default values):
 
-### account\_alias
+### <a name="input_account_alias"></a> [account\_alias](#input\_account\_alias)
 
 Description: Assign the account alias for the AWS Account. Unmanaged by default. Resource will be created if the string is non-empty.
 
@@ -520,7 +531,7 @@ Type: `string`
 
 Default: `""`
 
-### account\_pass\_policy
+### <a name="input_account_pass_policy"></a> [account\_pass\_policy](#input\_account\_pass\_policy)
 
 Description: Manages Password Policy for the AWS Account. Unmanaged by default. Resource will be created if 'manage' is set to true.
 
@@ -543,7 +554,7 @@ object({
 
 Default: `{}`
 
-### providers\_saml
+### <a name="input_providers_saml"></a> [providers\_saml](#input\_providers\_saml)
 
 Description: A list of dictionaries defining saml providers.
 
@@ -558,7 +569,7 @@ list(object({
 
 Default: `[]`
 
-### providers\_oidc
+### <a name="input_providers_oidc"></a> [providers\_oidc](#input\_providers\_oidc)
 
 Description: A list of dictionaries defining openid connect providers.
 
@@ -574,7 +585,7 @@ list(object({
 
 Default: `[]`
 
-### policies
+### <a name="input_policies"></a> [policies](#input\_policies)
 
 Description: A list of dictionaries defining all policies.
 
@@ -592,7 +603,7 @@ list(object({
 
 Default: `[]`
 
-### groups
+### <a name="input_groups"></a> [groups](#input\_groups)
 
 Description: A list of dictionaries defining all groups.
 
@@ -614,7 +625,7 @@ list(object({
 
 Default: `[]`
 
-### users
+### <a name="input_users"></a> [users](#input\_users)
 
 Description: A list of dictionaries defining all users.
 
@@ -643,7 +654,7 @@ list(object({
 
 Default: `[]`
 
-### roles
+### <a name="input_roles"></a> [roles](#input\_roles)
 
 Description: A list of dictionaries defining all roles.
 
@@ -670,7 +681,7 @@ list(object({
 
 Default: `[]`
 
-### policy\_path
+### <a name="input_policy_path"></a> [policy\_path](#input\_policy\_path)
 
 Description: The default path under which to create the policy if not specified in the policies list. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure.
 
@@ -678,7 +689,7 @@ Type: `string`
 
 Default: `"/"`
 
-### policy\_desc
+### <a name="input_policy_desc"></a> [policy\_desc](#input\_policy\_desc)
 
 Description: The default description of the policy.
 
@@ -686,7 +697,7 @@ Type: `string`
 
 Default: `"Managed by Terraform"`
 
-### group\_path
+### <a name="input_group_path"></a> [group\_path](#input\_group\_path)
 
 Description: The path under which to create the group. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure.
 
@@ -694,7 +705,7 @@ Type: `string`
 
 Default: `"/"`
 
-### user\_path
+### <a name="input_user_path"></a> [user\_path](#input\_user\_path)
 
 Description: The path under which to create the user. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure.
 
@@ -702,7 +713,7 @@ Type: `string`
 
 Default: `"/"`
 
-### role\_path
+### <a name="input_role_path"></a> [role\_path](#input\_role\_path)
 
 Description: The path under which to create the role. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division\_abc/subdivision\_xyz/product\_1234/engineering/ to match your company's organizational structure.
 
@@ -710,7 +721,7 @@ Type: `string`
 
 Default: `"/"`
 
-### role\_desc
+### <a name="input_role_desc"></a> [role\_desc](#input\_role\_desc)
 
 Description: The description of the role.
 
@@ -718,7 +729,7 @@ Type: `string`
 
 Default: `"Managed by Terraform"`
 
-### role\_max\_session\_duration
+### <a name="input_role_max_session_duration"></a> [role\_max\_session\_duration](#input\_role\_max\_session\_duration)
 
 Description: The maximum session duration (in seconds) that you want to set for the specified role. This setting can have a value from 1 hour to 12 hours specified in seconds.
 
@@ -726,7 +737,7 @@ Type: `number`
 
 Default: `3600`
 
-### role\_force\_detach\_policies
+### <a name="input_role_force_detach_policies"></a> [role\_force\_detach\_policies](#input\_role\_force\_detach\_policies)
 
 Description: Specifies to force detaching any policies the role has before destroying it.
 
@@ -734,7 +745,7 @@ Type: `bool`
 
 Default: `true`
 
-### tags
+### <a name="input_tags"></a> [tags](#input\_tags)
 
 Description: Key-value mapping of tags for the IAM role or user.
 
@@ -744,45 +755,44 @@ Default: `{}`
 
 <!-- TFDOCS_INPUTS_END -->
 
-
 <!-- TFDOCS_OUTPUTS_START -->
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| account\_alias | Created Account alias. |
-| account\_pass\_policy | Created Account password policy. |
-| debug\_local\_group\_inline\_policies | The transformed group inline policy map |
-| debug\_local\_group\_policies | The transformed group policy map |
-| debug\_local\_group\_policy\_arns | The transformed group policy arns map |
-| debug\_local\_policies | The transformed policy map |
-| debug\_local\_role\_inline\_policies | The transformed role inline policy map |
-| debug\_local\_role\_policies | The transformed role policy map |
-| debug\_local\_role\_policy\_arns | The transformed role policy arns map |
-| debug\_local\_user\_access\_keys | The transformed user access key map |
-| debug\_local\_user\_inline\_policies | The transformed user inline policy map |
-| debug\_local\_user\_policies | The transformed user policy map |
-| debug\_local\_user\_policy\_arns | The transformed user policy arns map |
-| debug\_var\_groups | The defined groups list |
-| debug\_var\_policies | The transformed policy map |
-| debug\_var\_roles | The defined roles list |
-| debug\_var\_users | The defined users list |
-| group\_inline\_policy\_attachments | Attached group inline IAM policies |
-| group\_policy\_arn\_attachments | Attached group IAM policy arns |
-| group\_policy\_attachments | Attached group customer managed IAM policies |
-| groups | Created IAM groups |
-| policies | Created customer managed IAM policies |
-| providers\_oidc | Created OpenID Connect providers. |
-| providers\_saml | Created SAML providers. |
-| role\_inline\_policy\_attachments | Attached role inline IAM policies |
-| role\_policy\_arn\_attachments | Attached role IAM policy arns |
-| role\_policy\_attachments | Attached role customer managed IAM policies |
-| roles | Created IAM roles |
-| user\_group\_memberships | Assigned user/group memberships |
-| user\_inline\_policy\_attachments | Attached user inline IAM policies |
-| user\_policy\_arn\_attachments | Attached user IAM policy arns |
-| user\_policy\_attachments | Attached user customer managed IAM policies |
-| users | Created IAM users |
+| <a name="output_account_alias"></a> [account\_alias](#output\_account\_alias) | Created Account alias. |
+| <a name="output_account_pass_policy"></a> [account\_pass\_policy](#output\_account\_pass\_policy) | Created Account password policy. |
+| <a name="output_debug_local_group_inline_policies"></a> [debug\_local\_group\_inline\_policies](#output\_debug\_local\_group\_inline\_policies) | The transformed group inline policy map |
+| <a name="output_debug_local_group_policies"></a> [debug\_local\_group\_policies](#output\_debug\_local\_group\_policies) | The transformed group policy map |
+| <a name="output_debug_local_group_policy_arns"></a> [debug\_local\_group\_policy\_arns](#output\_debug\_local\_group\_policy\_arns) | The transformed group policy arns map |
+| <a name="output_debug_local_policies"></a> [debug\_local\_policies](#output\_debug\_local\_policies) | The transformed policy map |
+| <a name="output_debug_local_role_inline_policies"></a> [debug\_local\_role\_inline\_policies](#output\_debug\_local\_role\_inline\_policies) | The transformed role inline policy map |
+| <a name="output_debug_local_role_policies"></a> [debug\_local\_role\_policies](#output\_debug\_local\_role\_policies) | The transformed role policy map |
+| <a name="output_debug_local_role_policy_arns"></a> [debug\_local\_role\_policy\_arns](#output\_debug\_local\_role\_policy\_arns) | The transformed role policy arns map |
+| <a name="output_debug_local_user_access_keys"></a> [debug\_local\_user\_access\_keys](#output\_debug\_local\_user\_access\_keys) | The transformed user access key map |
+| <a name="output_debug_local_user_inline_policies"></a> [debug\_local\_user\_inline\_policies](#output\_debug\_local\_user\_inline\_policies) | The transformed user inline policy map |
+| <a name="output_debug_local_user_policies"></a> [debug\_local\_user\_policies](#output\_debug\_local\_user\_policies) | The transformed user policy map |
+| <a name="output_debug_local_user_policy_arns"></a> [debug\_local\_user\_policy\_arns](#output\_debug\_local\_user\_policy\_arns) | The transformed user policy arns map |
+| <a name="output_debug_var_groups"></a> [debug\_var\_groups](#output\_debug\_var\_groups) | The defined groups list |
+| <a name="output_debug_var_policies"></a> [debug\_var\_policies](#output\_debug\_var\_policies) | The transformed policy map |
+| <a name="output_debug_var_roles"></a> [debug\_var\_roles](#output\_debug\_var\_roles) | The defined roles list |
+| <a name="output_debug_var_users"></a> [debug\_var\_users](#output\_debug\_var\_users) | The defined users list |
+| <a name="output_group_inline_policy_attachments"></a> [group\_inline\_policy\_attachments](#output\_group\_inline\_policy\_attachments) | Attached group inline IAM policies |
+| <a name="output_group_policy_arn_attachments"></a> [group\_policy\_arn\_attachments](#output\_group\_policy\_arn\_attachments) | Attached group IAM policy arns |
+| <a name="output_group_policy_attachments"></a> [group\_policy\_attachments](#output\_group\_policy\_attachments) | Attached group customer managed IAM policies |
+| <a name="output_groups"></a> [groups](#output\_groups) | Created IAM groups |
+| <a name="output_policies"></a> [policies](#output\_policies) | Created customer managed IAM policies |
+| <a name="output_providers_oidc"></a> [providers\_oidc](#output\_providers\_oidc) | Created OpenID Connect providers. |
+| <a name="output_providers_saml"></a> [providers\_saml](#output\_providers\_saml) | Created SAML providers. |
+| <a name="output_role_inline_policy_attachments"></a> [role\_inline\_policy\_attachments](#output\_role\_inline\_policy\_attachments) | Attached role inline IAM policies |
+| <a name="output_role_policy_arn_attachments"></a> [role\_policy\_arn\_attachments](#output\_role\_policy\_arn\_attachments) | Attached role IAM policy arns |
+| <a name="output_role_policy_attachments"></a> [role\_policy\_attachments](#output\_role\_policy\_attachments) | Attached role customer managed IAM policies |
+| <a name="output_roles"></a> [roles](#output\_roles) | Created IAM roles |
+| <a name="output_user_group_memberships"></a> [user\_group\_memberships](#output\_user\_group\_memberships) | Assigned user/group memberships |
+| <a name="output_user_inline_policy_attachments"></a> [user\_inline\_policy\_attachments](#output\_user\_inline\_policy\_attachments) | Attached user inline IAM policies |
+| <a name="output_user_policy_arn_attachments"></a> [user\_policy\_arn\_attachments](#output\_user\_policy\_arn\_attachments) | Attached user IAM policy arns |
+| <a name="output_user_policy_attachments"></a> [user\_policy\_attachments](#output\_user\_policy\_attachments) | Attached user customer managed IAM policies |
+| <a name="output_users"></a> [users](#output\_users) | Created IAM users |
 
 <!-- TFDOCS_OUTPUTS_END -->
 
