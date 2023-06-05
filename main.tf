@@ -35,6 +35,7 @@ resource "aws_iam_saml_provider" "default" {
 
   name                   = each.value.name
   saml_metadata_document = file(each.value.file)
+  tags                   = var.tags
 }
 
 # Create OpenID Connect providers
@@ -44,6 +45,7 @@ resource "aws_iam_openid_connect_provider" "default" {
   url             = each.value.url
   client_id_list  = each.value.client_id_list
   thumbprint_list = each.value.thumbprint_list
+  tags            = var.tags
 }
 
 
@@ -59,6 +61,7 @@ resource "aws_iam_policy" "policies" {
   path        = each.value.path != null ? each.value.path : var.policy_path
   description = each.value.desc != null ? each.value.desc : var.policy_desc
   policy      = templatefile(each.value.file, each.value.vars)
+  tags        = var.tags
 }
 
 
