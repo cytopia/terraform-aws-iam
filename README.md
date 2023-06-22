@@ -762,21 +762,6 @@ Default: `{}`
 |------|-------------|
 | <a name="output_account_alias"></a> [account\_alias](#output\_account\_alias) | Created Account alias. |
 | <a name="output_account_pass_policy"></a> [account\_pass\_policy](#output\_account\_pass\_policy) | Created Account password policy. |
-| <a name="output_debug_local_group_inline_policies"></a> [debug\_local\_group\_inline\_policies](#output\_debug\_local\_group\_inline\_policies) | The transformed group inline policy map |
-| <a name="output_debug_local_group_policies"></a> [debug\_local\_group\_policies](#output\_debug\_local\_group\_policies) | The transformed group policy map |
-| <a name="output_debug_local_group_policy_arns"></a> [debug\_local\_group\_policy\_arns](#output\_debug\_local\_group\_policy\_arns) | The transformed group policy arns map |
-| <a name="output_debug_local_policies"></a> [debug\_local\_policies](#output\_debug\_local\_policies) | The transformed policy map |
-| <a name="output_debug_local_role_inline_policies"></a> [debug\_local\_role\_inline\_policies](#output\_debug\_local\_role\_inline\_policies) | The transformed role inline policy map |
-| <a name="output_debug_local_role_policies"></a> [debug\_local\_role\_policies](#output\_debug\_local\_role\_policies) | The transformed role policy map |
-| <a name="output_debug_local_role_policy_arns"></a> [debug\_local\_role\_policy\_arns](#output\_debug\_local\_role\_policy\_arns) | The transformed role policy arns map |
-| <a name="output_debug_local_user_access_keys"></a> [debug\_local\_user\_access\_keys](#output\_debug\_local\_user\_access\_keys) | The transformed user access key map |
-| <a name="output_debug_local_user_inline_policies"></a> [debug\_local\_user\_inline\_policies](#output\_debug\_local\_user\_inline\_policies) | The transformed user inline policy map |
-| <a name="output_debug_local_user_policies"></a> [debug\_local\_user\_policies](#output\_debug\_local\_user\_policies) | The transformed user policy map |
-| <a name="output_debug_local_user_policy_arns"></a> [debug\_local\_user\_policy\_arns](#output\_debug\_local\_user\_policy\_arns) | The transformed user policy arns map |
-| <a name="output_debug_var_groups"></a> [debug\_var\_groups](#output\_debug\_var\_groups) | The defined groups list |
-| <a name="output_debug_var_policies"></a> [debug\_var\_policies](#output\_debug\_var\_policies) | The transformed policy map |
-| <a name="output_debug_var_roles"></a> [debug\_var\_roles](#output\_debug\_var\_roles) | The defined roles list |
-| <a name="output_debug_var_users"></a> [debug\_var\_users](#output\_debug\_var\_users) | The defined users list |
 | <a name="output_group_inline_policy_attachments"></a> [group\_inline\_policy\_attachments](#output\_group\_inline\_policy\_attachments) | Attached group inline IAM policies |
 | <a name="output_group_policy_arn_attachments"></a> [group\_policy\_arn\_attachments](#output\_group\_policy\_arn\_attachments) | Attached group IAM policy arns |
 | <a name="output_group_policy_attachments"></a> [group\_policy\_attachments](#output\_group\_policy\_attachments) | Attached group customer managed IAM policies |
@@ -829,11 +814,11 @@ Default: `{}`
 
 ## Authors
 
-Module managed by [cytopia](https://github.com/cytopia).
+Forked from [cytopia](https://github.com/cytopia).
 
 
 ## License
 
 **[MIT License](LICENSE)**
 
-Copyright (c) 2018 **[cytopia](https://github.com/cytopia)**
+Copyright (c) 2023 **[Flaconi GmbH](https://github.com/flaconi)**
