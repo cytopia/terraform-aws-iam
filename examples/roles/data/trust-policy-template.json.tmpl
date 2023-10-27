@@ -6,7 +6,7 @@
       "Action": "sts:AssumeRole",
       "Principal": {
         "AWS": [
-          "arn:aws:iam::1234567890123:role/federation/LOGIN-ROLE"
+          "arn:aws:iam::${aws_account_id}:role/federation/LOGIN-ROLE"
         ]
       },
       "Condition": {}

@@ -1,0 +1,17 @@
+---
+name: Backup Repository
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  backup:
+    uses: Flaconi/github-reusable-workflow/.github/workflows/backups.yml@v1
+    with:
+      enabled: True
+      region: eu-central-1
+    secrets:
+      iam_role_arn: ${{ secrets.BACKUP_REPO_IAM_ROLE }}
+      bucket_name: ${{ secrets.BACKUP_REPO_BUCKET }}

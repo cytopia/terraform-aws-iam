@@ -4,7 +4,6 @@ policies = [
     path = "/assume/"
     desc = "Provides read-only access to billing"
     file = "data/billing-ro.json"
-    vars = {}
   },
   {
     name = "rds-authenticate"

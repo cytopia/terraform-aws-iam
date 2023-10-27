@@ -11,29 +11,18 @@ variable "account_alias" {
 variable "account_pass_policy" {
   description = "Manages Password Policy for the AWS Account. Unmanaged by default. Resource will be created if 'manage' is set to true."
   type = object({
-    manage                         = bool   # Set to true, to manage the AWS account password policy
-    allow_users_to_change_password = bool   # Allow users to change their own password?
-    hard_expiry                    = bool   # Users are prevented from setting a new password after their password has expired?
-    max_password_age               = number # Number of days that an user password is valid
-    minimum_password_length        = number # Minimum length to require for user passwords
-    password_reuse_prevention      = number # The number of previous passwords that users are prevented from reusing
-    require_lowercase_characters   = bool   # Require lowercase characters for user passwords?
-    require_numbers                = bool   # Require numbers for user passwords?
-    require_symbols                = bool   # Require symbols for user passwords?
-    require_uppercase_characters   = bool   # Require uppercase characters for user passwords?
+    manage                         = optional(bool, false) # Set to true, to manage the AWS account password policy
+    allow_users_to_change_password = optional(bool)        # Allow users to change their own password?
+    hard_expiry                    = optional(bool)        # Users are prevented from setting a new password after their password has expired?
+    max_password_age               = optional(number)      # Number of days that an user password is valid
+    minimum_password_length        = optional(number)      # Minimum length to require for user passwords
+    password_reuse_prevention      = optional(number)      # The number of previous passwords that users are prevented from reusing
+    require_lowercase_characters   = optional(bool)        # Require lowercase characters for user passwords?
+    require_numbers                = optional(bool)        # Require numbers for user passwords?
+    require_symbols                = optional(bool)        # Require symbols for user passwords?
+    require_uppercase_characters   = optional(bool)        # Require uppercase characters for user passwords?
   })
-  default = {
-    manage                         = false
-    allow_users_to_change_password = null
-    hard_expiry                    = null
-    max_password_age               = null
-    minimum_password_length        = null
-    password_reuse_prevention      = null
-    require_lowercase_characters   = null
-    require_numbers                = null
-    require_symbols                = null
-    require_uppercase_characters   = null
-  }
+  default = {}
 }
 
 
@@ -95,11 +84,11 @@ variable "providers_oidc" {
 variable "policies" {
   description = "A list of dictionaries defining all policies."
   type = list(object({
-    name = string      # Name of the policy
-    path = string      # Defaults to 'var.policy_path' if variable is set to null
-    desc = string      # Defaults to 'var.policy_desc' if variable is set to null
-    file = string      # Path to json or json.tmpl file of policy
-    vars = map(string) # Policy template variables {key: val, ...}
+    name = string                    # Name of the policy
+    path = optional(string)          # Defaults to 'var.policy_path' if variable is set to null
+    desc = optional(string)          # Defaults to 'var.policy_desc' if variable is set to null
+    file = string                    # Path to json or json.tmpl file of policy
+    vars = optional(map(string), {}) # Policy template variables {key = val, ...}
   }))
   default = []
 }
@@ -112,15 +101,15 @@ variable "policies" {
 variable "groups" {
   description = "A list of dictionaries defining all groups."
   type = list(object({
-    name        = string       # Name of the group
-    path        = string       # Defaults to 'var.group_path' if variable is set to null
-    policies    = list(string) # List of names of policies (must be defined in var.policies)
-    policy_arns = list(string) # List of existing policy ARN's
-    inline_policies = list(object({
-      name = string      # Name of the inline policy
-      file = string      # Path to json or json.tmpl file of policy
-      vars = map(string) # Policy template variables {key = val, ...}
-    }))
+    name        = string                     # Name of the group
+    path        = optional(string)           # Defaults to 'var.group_path' if variable is set to null
+    policies    = optional(list(string), []) # List of names of policies (must be defined in var.policies)
+    policy_arns = optional(list(string), []) # List of existing policy ARN's
+    inline_policies = optional(list(object({
+      name = string                    # Name of the inline policy
+      file = string                    # Path to json or json.tmpl file of policy
+      vars = optional(map(string), {}) # Policy template variables {key = val, ...}
+    })), [])
   }))
   default = []
 }
@@ -177,22 +166,22 @@ variable "groups" {
 variable "users" {
   description = "A list of dictionaries defining all users."
   type = list(object({
-    name   = string       # Name of the user
-    path   = string       # Defaults to 'var.user_path' if variable is set to null
-    groups = list(string) # List of group names to add this user to
-    access_keys = list(object({
-      name    = string # IaC identifier for first or second IAM access key (not used on AWS)
-      pgp_key = string # Leave empty for non or provide a b64-enc pubkey or keybase username
-      status  = string # 'Active' or 'Inactive'
-    }))
-    permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)
-    policies             = list(string) # List of names of policies (must be defined in var.policies)
-    policy_arns          = list(string) # List of existing policy ARN's
-    inline_policies = list(object({
-      name = string      # Name of the inline policy
-      file = string      # Path to json or json.tmpl file of policy
-      vars = map(string) # Policy template variables {key = val, ...}
-    }))
+    name   = string                     # Name of the user
+    path   = optional(string)           # Defaults to 'var.user_path' if variable is set to null
+    groups = optional(list(string), []) # List of group names to add this user to
+    access_keys = optional(list(object({
+      name    = string                     # IaC identifier for first or second IAM access key (not used on AWS)
+      pgp_key = optional(string)           # Leave empty for non or provide a b64-enc pubkey or keybase username
+      status  = optional(string, "Active") # 'Active' or 'Inactive'
+    })), [])
+    permissions_boundary = optional(string)           # ARN to a policy used as permissions boundary (or null/empty)
+    policies             = optional(list(string), []) # List of names of policies (must be defined in var.policies)
+    policy_arns          = optional(list(string), []) # List of existing policy ARN's
+    inline_policies = optional(list(object({
+      name = string                    # Name of the inline policy
+      file = string                    # Path to json or json.tmpl file of policy
+      vars = optional(map(string), {}) # Policy template variables {key = val, ...}
+    })), [])
   }))
   default = []
 }
@@ -239,18 +228,20 @@ variable "users" {
 variable "roles" {
   description = "A list of dictionaries defining all roles."
   type = list(object({
-    name                 = string       # Name of the role
-    path                 = string       # Defaults to 'var.role_path' if variable is set to null
-    desc                 = string       # Defaults to 'var.role_desc' if variable is set to null
-    trust_policy_file    = string       # Path to file of trust/assume policy
-    permissions_boundary = string       # ARN to a policy used as permissions boundary (or null/empty)
-    policies             = list(string) # List of names of policies (must be defined in var.policies)
-    policy_arns          = list(string) # List of existing policy ARN's
-    inline_policies = list(object({
-      name = string      # Name of the inline policy
-      file = string      # Path to json or json.tmpl file of policy
-      vars = map(string) # Policy template variables {key = val, ...}
-    }))
+    name                 = string                     # Name of the role
+    instance_profile     = optional(string)           # Name of the instance profile
+    path                 = optional(string)           # Defaults to 'var.role_path' if variable is set to null
+    desc                 = optional(string)           # Defaults to 'var.role_desc' if variable is set to null
+    trust_policy_file    = string                     # Path to file of trust/assume policy. Will be templated if vars are passed.
+    trust_policy_vars    = optional(map(string), {})  # Policy template variables {key = val, ...}
+    permissions_boundary = optional(string)           # ARN to a policy used as permissions boundary (or null/empty)
+    policies             = optional(list(string), []) # List of names of policies (must be defined in var.policies)
+    policy_arns          = optional(list(string), []) # List of existing policy ARN's
+    inline_policies = optional(list(object({
+      name = string                    # Name of the inline policy
+      file = string                    # Path to json or json.tmpl file of policy
+      vars = optional(map(string), {}) # Policy template variables {key = val, ...}
+    })), [])
   }))
   default = []
 }
@@ -261,11 +252,13 @@ variable "roles" {
 # -------------------------------------------------------------------------------------------------
 
 variable "policy_path" {
+  type        = string
   description = "The default path under which to create the policy if not specified in the policies list. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure."
   default     = "/"
 }
 
 variable "policy_desc" {
+  type        = string
   description = "The default description of the policy."
   default     = "Managed by Terraform"
 }
@@ -276,6 +269,7 @@ variable "policy_desc" {
 # -------------------------------------------------------------------------------------------------
 
 variable "group_path" {
+  type        = string
   description = "The path under which to create the group. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure."
   default     = "/"
 }
@@ -286,6 +280,7 @@ variable "group_path" {
 # -------------------------------------------------------------------------------------------------
 
 variable "user_path" {
+  type        = string
   description = "The path under which to create the user. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure."
   default     = "/"
 }
@@ -296,21 +291,25 @@ variable "user_path" {
 # -------------------------------------------------------------------------------------------------
 
 variable "role_path" {
+  type        = string
   description = "The path under which to create the role. You can use a single path, or nest multiple paths as if they were a folder structure. For example, you could use the nested path /division_abc/subdivision_xyz/product_1234/engineering/ to match your company's organizational structure."
   default     = "/"
 }
 
 variable "role_desc" {
+  type        = string
   description = "The description of the role."
   default     = "Managed by Terraform"
 }
 
 variable "role_max_session_duration" {
+  type        = number
   description = "The maximum session duration (in seconds) that you want to set for the specified role. This setting can have a value from 1 hour to 12 hours specified in seconds."
-  default     = "3600"
+  default     = 3600
 }
 
 variable "role_force_detach_policies" {
+  type        = bool
   description = "Specifies to force detaching any policies the role has before destroying it."
   default     = true
 }
@@ -322,6 +321,6 @@ variable "role_force_detach_policies" {
 
 variable "tags" {
   description = "Key-value mapping of tags for the IAM role or user."
-  type        = map(any)
+  type        = map(string)
   default     = {}
 }

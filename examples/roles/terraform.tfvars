@@ -4,36 +4,30 @@ policies = [
     path = "/assume/"
     desc = "Provides read-only access to billing"
     file = "data/billing-ro.json"
-    vars = {}
   },
 ]
 
 roles = [
   {
-    name                 = "ROLE-CUSTOM-POLICY"
-    path                 = null
-    desc                 = null
-    trust_policy_file    = "data/trust-policy-file.json"
-    permissions_boundary = null
-    policies             = ["billing-ro"]
-    policy_arns          = []
-    inline_policies      = []
+    name              = "ROLE-CUSTOM-POLICY"
+    trust_policy_file = "data/trust-policy-file.json"
+    policies          = ["billing-ro"]
   },
   {
-    name                 = "ROLE-POLICY-ARN"
-    path                 = null
-    desc                 = null
-    trust_policy_file    = "data/trust-policy-file.json"
-    permissions_boundary = null
-    policies             = []
-    policy_arns          = ["arn:aws:iam::aws:policy/PowerUserAccess"]
-    inline_policies      = []
+    name              = "ROLE-POLICY-ARN"
+    trust_policy_file = "data/trust-policy-template.json.tmpl"
+    trust_policy_vars = {
+      aws_account_id = "123456789012"
+    }
+    policy_arns = ["arn:aws:iam::aws:policy/PowerUserAccess"]
   },
   {
     name                 = "ROLE-INLINE-POLICY"
+    instance_profile     = null
     path                 = null
     desc                 = null
     trust_policy_file    = "data/trust-policy-file.json"
+    trust_policy_vars    = null
     permissions_boundary = null
     policies             = []
     policy_arns          = []
@@ -48,12 +42,8 @@ roles = [
     ]
   },
   {
-    name                 = "ROLE-MULTIPLE-POLICIES"
-    path                 = null
-    desc                 = null
-    trust_policy_file    = "data/trust-policy-file.json"
-    permissions_boundary = null
-    policies             = []
+    name              = "ROLE-MULTIPLE-POLICIES"
+    trust_policy_file = "data/trust-policy-file.json"
     policy_arns = [
       "arn:aws:iam::aws:policy/PowerUserAccess",
       "arn:aws:iam::aws:policy/AmazonEC2FullAccess",
@@ -69,18 +59,19 @@ roles = [
       {
         name = "billing-ro"
         file = "data/billing-ro.json"
-        vars = {}
       }
     ]
   },
   {
     name                 = "ROLE-PERMISSION-BOUNDARY"
-    path                 = null
-    desc                 = null
     trust_policy_file    = "data/trust-policy-file.json"
     permissions_boundary = "arn:aws:iam::aws:policy/PowerUserAccess"
-    policies             = []
     policy_arns          = ["arn:aws:iam::aws:policy/AdministratorAccess"]
-    inline_policies      = []
+  },
+  {
+    name              = "ROLE-ATTACHED-TO-AN-INSTANCE-PROFILE"
+    instance_profile  = "MY-INSTANCE-PROFILE-1"
+    trust_policy_file = "data/trust-policy-file.json"
+    policy_arns       = ["arn:aws:iam::aws:policy/PowerUserAccess"]
   },
 ]
