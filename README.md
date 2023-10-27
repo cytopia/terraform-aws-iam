@@ -773,6 +773,7 @@ Default: `{}`
 | <a name="output_role_policy_arn_attachments"></a> [role\_policy\_arn\_attachments](#output\_role\_policy\_arn\_attachments) | Attached role IAM policy arns |
 | <a name="output_role_policy_attachments"></a> [role\_policy\_attachments](#output\_role\_policy\_attachments) | Attached role customer managed IAM policies |
 | <a name="output_roles"></a> [roles](#output\_roles) | Created IAM roles |
+| <a name="output_user_access_keys"></a> [user\_access\_keys](#output\_user\_access\_keys) | Created access keys |
 | <a name="output_user_group_memberships"></a> [user\_group\_memberships](#output\_user\_group\_memberships) | Assigned user/group memberships |
 | <a name="output_user_inline_policy_attachments"></a> [user\_inline\_policy\_attachments](#output\_user\_inline\_policy\_attachments) | Attached user inline IAM policies |
 | <a name="output_user_policy_arn_attachments"></a> [user\_policy\_arn\_attachments](#output\_user\_policy\_arn\_attachments) | Attached user IAM policy arns |

@@ -64,5 +64,6 @@ No resources.
 | <a name="output_policies"></a> [policies](#output\_policies) | Created customer managed IAM policies |
 | <a name="output_groups"></a> [groups](#output\_groups) | Created groups |
 | <a name="output_users"></a> [users](#output\_users) | Created users |
+| <a name="output_users_keys"></a> [users\_keys](#output\_users\_keys) | Created user's access keys |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
